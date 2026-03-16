@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReOrder</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; min-height: 100vh; padding: 1rem; }
+.app { max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; padding: 1.25rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* Header */
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid #e5e5e0; }
+.header-left h1 { font-size: 22px; font-weight: 600; color: #1a1a18; letter-spacing: -0.3px; }
+.header-left h1 span { color: #185FA5; }
+.header-left p { font-size: 13px; color: #888780; margin-top: 3px; }
+.role-badge { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 500; margin-left: 8px; vertical-align: middle; }
+.role-badge.owner { background: #FAEEDA; color: #854F0B; }
+.role-badge.admin { background: #E6F1FB; color: #185FA5; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.hdr-btn { font-family: inherit; font-size: 12px; padding: 5px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: white; color: #888780; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+.hdr-btn:hover { background: #f1efe8; }
+.hdr-btn.active { background: #1a1a18; color: white; border-color: #1a1a18; }
+
+/* Screens */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* PIN */
+.pin-wrap { text-align: center; padding: 2rem 0; }
+.pin-title { font-size: 17px; font-weight: 500; color: #1a1a18; margin-bottom: 6px; }
+.pin-sub { font-size: 13px; color: #888780; margin-bottom: 1.5rem; }
+.pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 1.5rem; }
+.pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #d3d1c7; background: white; transition: background 0.15s, border-color 0.15s; }
+.pin-dot.filled { background: #1a1a18; border-color: #1a1a18; }
+.pin-dot.error { background: #E24B4A; border-color: #E24B4A; }
+.pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 240px; margin: 0 auto; }
+.pin-key { padding: 16px; border-radius: 12px; border: 0.5px solid #e5e5e0; background: white; font-size: 20px; font-weight: 500; color: #1a1a18; cursor: pointer; transition: background 0.1s, transform 0.1s; user-select: none; font-family: inherit; }
+.pin-key:hover { background: #f1efe8; }
+.pin-key:active { transform: scale(0.95); }
+.pin-key.del { font-size: 16px; color: #888780; }
+.pin-error-msg { font-size: 13px; color: #E24B4A; margin-top: 1rem; min-height: 20px; }
+
+/* Mode cards */
+.mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mode-card { border: 0.5px solid #d3d1c7; border-radius: 12px; padding: 2.5rem 1rem; text-align: center; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.mode-card:active { transform: scale(0.97); }
+.mode-card.receive { border-color: #1D9E75; }
+.mode-card.receive:hover { background: #E1F5EE; }
+.mode-card.order { border-color: #185FA5; }
+.mode-card.order:hover { background: #E6F1FB; }
+.mode-card .icon { font-size: 36px; margin-bottom: 12px; }
+.mode-card .label { font-size: 16px; font-weight: 500; color: #1a1a18; }
+
+/* Top bar */
+.top-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+.back-btn { display: flex; align-items: center; gap: 5px; background: none; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 6px 12px; font-size: 13px; color: #888780; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+.back-btn:hover { background: #f1efe8; }
+.back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+.mode-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+.mode-badge.receive { background: #E1F5EE; color: #0F6E56; }
+.mode-badge.order { background: #E6F1FB; color: #185FA5; }
+.mode-badge .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.mode-badge.receive .dot { background: #0F6E56; }
+.mode-badge.order .dot { background: #185FA5; }
+
+/* Panels */
+.panel { border: 0.5px solid #e5e5e0; border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
+.panel-hdr { background: #f1efe8; padding: 10px 14px; font-size: 12px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 0.5px solid #e5e5e0; }
+.panel-row { padding: 12px 14px; border-bottom: 0.5px solid #e5e5e0; }
+.panel-row:last-child { border-bottom: none; }
+.row-lbl { font-size: 14px; font-weight: 500; color: #1a1a18; margin-bottom: 3px; }
+.row-sub { font-size: 12px; color: #888780; margin-bottom: 10px; line-height: 1.5; }
+.hint { font-size: 12px; color: #888780; padding: 8px 10px; background: #f1efe8; border-radius: 8px; margin-bottom: 10px; line-height: 1.5; }
+.pinput { font-family: inherit; font-size: 13px; padding: 8px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: white; color: #1a1a18; outline: none; width: 100%; margin-bottom: 8px; }
+.save-msg { font-size: 12px; color: #0F6E56; display: none; margin-top: 4px; }
+.status-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 0.5px solid #e5e5e0; }
+.status-row:last-child { border-bottom: none; }
+.status-lbl { font-size: 14px; color: #1a1a18; flex: 1; }
+.status-val { font-size: 12px; font-weight: 500; }
+.status-val.linked { color: #0F6E56; }
+.status-val.notset { color: #888780; }
+.lock-svg { width: 14px; height: 14px; stroke: #888780; fill: none; stroke-width: 2; flex-shrink: 0; }
+
+/* Members */
+.member-list { padding: 0 14px; min-height: 4px; }
+.member-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #e5e5e0; }
+.member-row:last-child { border-bottom: none; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; position: relative; }
+.avatar.owner { background: #FAEEDA; color: #854F0B; }
+.avatar.admin { background: #E6F1FB; color: #185FA5; }
+.avatar.member { background: #f1efe8; color: #888780; }
+.avatar.inactive { background: #f1efe8; color: #c0bfb8; }
+.successor-dot { position: absolute; bottom: 0; right: 0; width: 9px; height: 9px; border-radius: 50%; background: #0F6E56; border: 1.5px solid white; }
+.minfo { flex: 1; min-width: 0; }
+.mname { font-size: 14px; font-weight: 500; color: #1a1a18; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mname.inactive { color: #888780; }
+.mmeta { font-size: 12px; color: #888780; margin-top: 2px; }
+.mbadges { display: flex; gap: 5px; flex-shrink: 0; }
+.mb { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; white-space: nowrap; }
+.mb.owner { background: #FAEEDA; color: #854F0B; }
+.mb.admin { background: #E6F1FB; color: #185FA5; }
+.mb.member { background: #f1efe8; color: #888780; }
+.mb.active { background: #EAF3DE; color: #3B6D11; }
+.mb.inactive { background: #f1efe8; color: #888780; }
+.mact { display: flex; gap: 4px; }
+.icon-btn { background: none; border: none; cursor: pointer; color: #888780; padding: 4px; border-radius: 6px; transition: background 0.15s; }
+.icon-btn:hover { background: #f1efe8; }
+.icon-btn.danger:hover { background: #FCEBEB; color: #A32D2D; }
+.icon-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; display: block; }
+.add-form { padding: 12px 14px 14px; border-top: 0.5px solid #e5e5e0; display: flex; flex-direction: column; gap: 8px; }
+.add-row { display: flex; gap: 8px; }
+.add-row input, .add-row select { font-family: inherit; font-size: 13px; padding: 7px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: white; color: #1a1a18; outline: none; width: 100%; }
+.add-btn { padding: 8px 14px; border-radius: 8px; border: none; background: #185FA5; color: #E6F1FB; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; white-space: nowrap; flex-shrink: 0; }
+.pin-generated { font-size: 13px; color: #888780; padding: 8px 10px; background: #f1efe8; border-radius: 8px; display: none; line-height: 1.5; }
+.pin-generated strong { color: #1a1a18; font-weight: 500; }
+
+/* Successor */
+.successor-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 0.5px solid #e5e5e0; }
+.successor-row:last-child { border-bottom: none; }
+.successor-lbl { font-size: 14px; color: #1a1a18; }
+.successor-val { font-size: 13px; color: #888780; }
+.successor-val.set { color: #0F6E56; font-weight: 500; }
+
+/* Vote banner */
+.vote-banner { background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 10px; padding: 12px 14px; margin-bottom: 1.25rem; font-size: 13px; color: #854F0B; line-height: 1.5; }
+.vote-banner strong { font-weight: 500; }
+
+/* Buttons */
+.btn-row { display: flex; gap: 8px; margin-top: 8px; }
+.btn { flex: 1; padding: 10px 16px; border-radius: 8px; border: 0.5px solid #d3d1c7; background: transparent; font-size: 14px; font-weight: 500; color: #1a1a18; cursor: pointer; font-family: inherit; transition: background 0.15s, transform 0.1s; }
+.btn:hover { background: #f1efe8; }
+.btn:active { transform: scale(0.98); }
+.btn.primary { background: #1a1a18; color: white; border-color: #1a1a18; }
+.btn.primary:hover { opacity: 0.85; }
+.btn.amber { background: #854F0B; color: #FAEEDA; border-color: #854F0B; }
+.btn.green { background: #0F6E56; color: #E1F5EE; border-color: #0F6E56; }
+.btn.blue { background: #185FA5; color: #E6F1FB; border-color: #185FA5; }
+.btn.danger { background: white; color: #A32D2D; border-color: #F09595; }
+.btn.danger:hover { background: #FCEBEB; }
+
+/* PIN display */
+.pin-display-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; }
+.pin-display-val { font-size: 22px; font-weight: 500; color: #1a1a18; letter-spacing: 6px; }
+.pin-display-actions { display: flex; gap: 8px; }
+.small-btn { font-family: inherit; font-size: 12px; padding: 5px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: white; color: #888780; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+.small-btn:hover { background: #f1efe8; }
+
+/* Camera */
+.section { margin-bottom: 1.25rem; }
+.sec-lbl { font-size: 12px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.camera-box { border-radius: 12px; overflow: hidden; position: relative; background: #000; min-height: 220px; display: flex; align-items: center; justify-content: center; }
+.camera-box video { width: 100%; display: block; }
+.cam-ph { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 2rem; text-align: center; }
+.cam-icon { width: 44px; height: 44px; background: #E6F1FB; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.cam-icon svg { width: 22px; height: 22px; stroke: #185FA5; fill: none; stroke-width: 1.5; }
+.scan-overlay { position: absolute; inset: 0; pointer-events: none; }
+.scan-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 70%; height: 55%; border: 2px solid rgba(255,255,255,0.7); border-radius: 8px; }
+.scan-frame::before,.scan-frame::after { content:''; position:absolute; width:20px; height:20px; border-color:white; border-style:solid; }
+.scan-frame::before { top:-2px;left:-2px;border-width:3px 0 0 3px;border-radius:4px 0 0 0; }
+.scan-frame::after { bottom:-2px;right:-2px;border-width:0 3px 3px 0;border-radius:0 0 4px 0; }
+.scan-line { position:absolute;left:15%;width:70%;height:2px;background:linear-gradient(90deg,transparent,#1D9E75,transparent);animation:scanline 2s ease-in-out infinite; }
+@keyframes scanline { 0%,100%{top:25%;opacity:.6}50%{top:70%;opacity:1} }
+.scan-status { position:absolute;bottom:12px;left:0;right:0;text-align:center; }
+.scan-status span { background:rgba(0,0,0,.6);color:white;font-size:12px;padding:4px 12px;border-radius:999px; }
+
+/* Pipeline */
+.pipe-steps { display:flex;flex-direction:column;gap:6px; }
+.pipe-step { display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;border:0.5px solid #e5e5e0;font-size:13px;color:#888780;transition:all .2s; }
+.pipe-step.active { border-color:#185FA5;color:#185FA5;background:#E6F1FB; }
+.pipe-step.done { border-color:#1D9E75;color:#0F6E56;background:#E1F5EE; }
+.pipe-step.skipped { opacity:.4; }
+.step-ic { width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:#f1efe8; }
+.pipe-step.active .step-ic { background:#185FA5;color:white; }
+.pipe-step.done .step-ic { background:#1D9E75;color:white; }
+.mini-spin { width:12px;height:12px;border:1.5px solid rgba(24,95,165,.3);border-top-color:#185FA5;border-radius:50%;animation:spin .7s linear infinite; }
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Form */
+.fields { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+.field { display:flex;flex-direction:column;gap:4px; }
+.field.full { grid-column:1/-1; }
+.field label { font-size:12px;color:#888780;font-weight:500; }
+.field input,.field textarea { font-family:inherit;font-size:14px;padding:8px 10px;border:0.5px solid #d3d1c7;border-radius:8px;background:white;color:#1a1a18;outline:none;width:100%; }
+.field textarea { resize:vertical;min-height:60px; }
+.chem-toggle-row { display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:0.5px solid #e5e5e0;margin-top:4px; }
+.chem-lbl { font-size:14px;color:#1a1a18;font-weight:500; }
+.chem-sub { font-size:12px;color:#888780;margin-top:2px; }
+.tog { position:relative;width:28px;height:16px;cursor:pointer;flex-shrink:0; }
+.tog input { opacity:0;width:0;height:0; }
+.tog-track { position:absolute;inset:0;border-radius:999px;background:#d3d1c7;transition:background 0.2s; }
+.tog input:checked + .tog-track { background:#185FA5; }
+.tog-thumb { position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;transition:transform 0.2s;pointer-events:none; }
+.tog input:checked ~ .tog-thumb { transform:translateX(12px); }
+
+/* Success */
+.success-wrap { text-align:center;padding:2.5rem 1rem; }
+.sicon { width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem; }
+.sicon.receive { background:#E1F5EE; }
+.sicon.order { background:#E6F1FB; }
+.sicon svg { width:26px;height:26px;fill:none;stroke-width:2.5; }
+.sicon.receive svg { stroke:#0F6E56; }
+.sicon.order svg { stroke:#185FA5; }
+.src-tag { display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;margin-bottom:1rem; }
+.src-tag.ai { background:#E6F1FB;color:#185FA5; }
+.src-tag.db { background:#E1F5EE;color:#0F6E56; }
+.src-tag.both { background:#FAEEDA;color:#854F0B; }
+.success-actions { display:flex;flex-direction:column;gap:10px; }
+
+/* Modal */
+.modal-bg { position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem; }
+.modal-box { background:white;border-radius:12px;border:0.5px solid #d3d1c7;padding:1.5rem;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px; }
+.modal-title { font-size:16px;font-weight:500;color:#1a1a18; }
+.modal-body { font-size:13px;color:#888780;line-height:1.6; }
+.modal-body strong { color:#1a1a18;font-weight:500; }
+.field-lbl { font-size:12px;color:#888780;font-weight:500;margin-bottom:3px; }
+.minput { font-family:inherit;font-size:14px;padding:8px 10px;border:0.5px solid #d3d1c7;border-radius:8px;background:white;color:#1a1a18;outline:none;width:100%; }
+.modal-btns { display:flex;gap:8px;margin-top:4px; }
+.mbtn { flex:1;padding:9px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;border:0.5px solid #d3d1c7;background:transparent;color:#1a1a18; }
+.mbtn.primary { background:#1a1a18;color:white;border-color:#1a1a18; }
+.mbtn.danger { background:white;color:#A32D2D;border-color:#F09595; }
+.mbtn.danger:hover { background:#FCEBEB; }
+#fileInput,#cameraInput { display:none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Re<span>Order</span><span class="role-badge" id="role-badge" style="display:none;"></span></h1>
+      <p id="header-sub">Research centre</p>
+    </div>
+    <div class="header-right">
+      <button class="hdr-btn" id="panel-btn" onclick="togglePanel()" style="display:none;"></button>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="screen-login" class="screen active">
+    <div class="pin-wrap">
+      <div class="pin-title">Welcome to ReOrder</div>
+      <div class="pin-sub">Enter your PIN to continue</div>
+      <div class="pin-dots" id="login-dots">
+        <div class="pin-dot" id="ld0"></div><div class="pin-dot" id="ld1"></div>
+        <div class="pin-dot" id="ld2"></div><div class="pin-dot" id="ld3"></div>
+      </div>
+      <div class="pin-grid">
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key" style="visibility:hidden;"></button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key del" onclick="pinDel()">⌫</button>
+      </div>
+      <div class="pin-error-msg" id="pin-error"></div>
+    </div>
+  </div>
+
+  <!-- CONFIRM PIN (first login) -->
+  <div id="screen-confirm-pin" class="screen">
+    <div class="pin-wrap">
+      <div class="pin-title">Confirm your PIN</div>
+      <div class="pin-sub">Enter your PIN once more to confirm</div>
+      <div class="pin-dots" id="confirm-dots">
+        <div class="pin-dot" id="cd0"></div><div class="pin-dot" id="cd1"></div>
+        <div class="pin-dot" id="cd2"></div><div class="pin-dot" id="cd3"></div>
+      </div>
+      <div class="pin-grid">
+        <button class="pin-key" onclick="confirmKey('1')">1</button>
+        <button class="pin-key" onclick="confirmKey('2')">2</button>
+        <button class="pin-key" onclick="confirmKey('3')">3</button>
+        <button class="pin-key" onclick="confirmKey('4')">4</button>
+        <button class="pin-key" onclick="confirmKey('5')">5</button>
+        <button class="pin-key" onclick="confirmKey('6')">6</button>
+        <button class="pin-key" onclick="confirmKey('7')">7</button>
+        <button class="pin-key" onclick="confirmKey('8')">8</button>
+        <button class="pin-key" onclick="confirmKey('9')">9</button>
+        <button class="pin-key" style="visibility:hidden;"></button>
+        <button class="pin-key" onclick="confirmKey('0')">0</button>
+        <button class="pin-key del" onclick="confirmDel()">⌫</button>
+      </div>
+      <div class="pin-error-msg" id="confirm-error"></div>
+    </div>
+  </div>
+
+  <!-- HOME (all roles) -->
+  <div id="screen-home" class="screen">
+    <div id="vote-home-banner" style="display:none;" class="vote-banner">
+      <strong>Ownership vote in progress</strong> — <span id="vote-home-info"></span>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="btn green" onclick="castVote(true)" style="font-size:13px;padding:7px;">Confirm</button>
+        <button class="btn danger" onclick="castVote(false)" style="font-size:13px;padding:7px;">Decline</button>
+      </div>
+    </div>
+    <div class="mode-cards">
+      <div class="mode-card receive" onclick="selectMode('receive')">
+        <div class="icon">📦</div><div class="label">Receive</div>
+      </div>
+      <div class="mode-card order" onclick="selectMode('order')">
+        <div class="icon">🛒</div><div class="label">Order</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OWNER ADMIN PANEL -->
+  <div id="screen-owner-settings" class="screen">
+    <div style="font-size:15px;font-weight:500;color:#1a1a18;margin-bottom:4px;">Admin panel</div>
+    <div style="font-size:13px;color:#888780;margin-bottom:1.25rem;">Full control over ReOrder and your team</div>
+
+    <div id="owner-vote-banner" style="display:none;" class="vote-banner">
+      <strong>Active ownership vote</strong> — <span id="owner-vote-info"></span>
+      <div style="margin-top:8px;">
+        <button class="btn danger" onclick="cancelVote()" style="font-size:13px;padding:7px;width:100%;">Cancel vote</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">Inventory spreadsheet</div>
+      <div class="panel-row">
+        <div class="row-lbl">Master Excel file</div>
+        <div class="row-sub">Where all scans are exported — stored on OneDrive</div>
+        <div class="hint">In OneDrive: open file → Share → Anyone with the link can edit → Copy link</div>
+        <input class="pinput" type="url" id="inp-excel" placeholder="https://onedrive.live.com/...">
+        <div class="btn-row" style="margin-top:0;">
+          <button class="btn amber" onclick="saveLink('excel')" style="font-size:13px;padding:8px;">Save</button>
+          <button class="btn" id="btn-open-excel" onclick="openLink('excel')" style="font-size:13px;padding:8px;display:none;">Open file</button>
+        </div>
+        <div class="save-msg" id="msg-excel">Saved.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">Product database</div>
+      <div class="panel-row">
+        <div class="row-lbl">Database spreadsheet</div>
+        <div class="row-sub">Known products list — checked before AI or internet search</div>
+        <div class="hint">In OneDrive: open file → Share → Anyone with the link can edit → Copy link</div>
+        <input class="pinput" type="url" id="inp-db" placeholder="https://onedrive.live.com/...">
+        <div class="btn-row" style="margin-top:0;">
+          <button class="btn amber" onclick="saveLink('db')" style="font-size:13px;padding:8px;">Save</button>
+          <button class="btn" id="btn-open-db" onclick="openLink('db')" style="font-size:13px;padding:8px;display:none;">Open file</button>
+        </div>
+        <div class="save-msg" id="msg-db">Saved.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">Connection status</div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl">Inventory spreadsheet</div>
+        <div class="status-val notset" id="st-excel">Not set</div>
+      </div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl">Product database</div>
+        <div class="status-val notset" id="st-db">Not set</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">Ownership successor</div>
+      <div class="successor-row">
+        <div>
+          <div class="successor-lbl">Designated successor</div>
+          <div style="font-size:12px;color:#888780;margin-top:2px;">Promoted to Owner if you leave</div>
+        </div>
+        <div class="successor-val" id="successor-val">None set</div>
+      </div>
+      <div class="panel-row">
+        <select class="pinput" id="successor-select" style="margin-bottom:8px;"><option value="">Select an Admin...</option></select>
+        <button class="btn amber" onclick="saveSuccessor()" style="font-size:13px;padding:8px;width:100%;">Set successor</button>
+        <div class="save-msg" id="msg-successor">Successor saved.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">Team members</div>
+      <div class="member-list" id="owner-member-list"></div>
+      <div class="add-form">
+        <div class="add-row">
+          <input type="text" id="o-name" placeholder="Full name">
+          <select id="o-role"><option value="member">Member</option><option value="admin">Admin</option></select>
+        </div>
+        <div class="pin-generated" id="o-pin-generated"></div>
+        <button class="add-btn" style="width:100%;" onclick="addMember('o')">Add member</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">My profile</div>
+      <div class="panel-row">
+        <div class="row-lbl">Display name</div>
+        <input class="pinput" type="text" id="owner-name-input">
+        <button class="btn primary" onclick="saveSelfName('owner')" style="font-size:13px;padding:8px;width:100%;">Save name</button>
+        <div class="save-msg" id="msg-owner-name">Name updated.</div>
+      </div>
+      <div class="pin-display-row">
+        <div class="pin-display-val" id="owner-pin-val">••••</div>
+        <div class="pin-display-actions">
+          <button class="small-btn" id="owner-pin-toggle" onclick="togglePin('owner')">Show</button>
+          <button class="small-btn" onclick="openResetPin()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr" style="color:#A32D2D;">Danger zone</div>
+      <div class="panel-row">
+        <div class="row-lbl">Transfer ownership</div>
+        <div class="row-sub">Irreversible. You will be demoted to Admin.</div>
+        <button class="btn danger" onclick="initiateOwnerTransfer()" style="width:100%;">Remove myself as Owner</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="screen-admin-settings" class="screen">
+    <div style="font-size:15px;font-weight:500;color:#1a1a18;margin-bottom:4px;">Admin panel</div>
+    <div style="font-size:13px;color:#888780;margin-bottom:1.25rem;">Manage team and configuration</div>
+
+    <div class="panel">
+      <div class="panel-hdr">Linked files</div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl">Inventory spreadsheet</div>
+        <div class="status-val notset" id="ast-excel">Not set</div>
+      </div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl">Product database</div>
+        <div class="status-val notset" id="ast-db">Not set</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">Team members</div>
+      <div class="member-list" id="admin-member-list"></div>
+      <div class="add-form">
+        <div class="add-row">
+          <input type="text" id="a-name" placeholder="Full name">
+        </div>
+        <div class="pin-generated" id="a-pin-generated"></div>
+        <button class="add-btn" style="width:100%;" onclick="addMember('a')">Add member</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">My profile</div>
+      <div class="panel-row">
+        <div class="row-lbl">Display name</div>
+        <input class="pinput" type="text" id="admin-name-input">
+        <button class="btn primary" onclick="saveSelfName('admin')" style="font-size:13px;padding:8px;width:100%;">Save name</button>
+        <div class="save-msg" id="msg-admin-name">Name updated.</div>
+      </div>
+      <div class="pin-display-row">
+        <div class="pin-display-val" id="admin-pin-val">••••</div>
+        <div class="pin-display-actions">
+          <button class="small-btn" id="admin-pin-toggle" onclick="togglePin('admin')">Show</button>
+          <button class="small-btn" onclick="openResetPin()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr">Ownership vote</div>
+      <div class="panel-row">
+        <div class="row-lbl">Propose a new Owner</div>
+        <div class="row-sub">All Admins and Members must confirm. Vote expires in 48 hours.</div>
+        <select class="pinput" id="vote-candidate-select" style="margin-bottom:8px;"><option value="">Select a candidate...</option></select>
+        <button class="btn blue" onclick="startOwnerVote()" style="width:100%;font-size:13px;padding:8px;">Start ownership vote</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMBER PROFILE -->
+  <div id="screen-member-profile" class="screen">
+    <div style="font-size:15px;font-weight:500;color:#1a1a18;margin-bottom:4px;">My profile</div>
+    <div style="font-size:13px;color:#888780;margin-bottom:1.25rem;">Manage your personal settings</div>
+    <div class="panel">
+      <div class="panel-hdr">Display name</div>
+      <div class="panel-row">
+        <input class="pinput" type="text" id="member-name-input" placeholder="Your name">
+        <button class="btn primary" onclick="saveSelfName('member')" style="font-size:13px;padding:8px;width:100%;">Save name</button>
+        <div class="save-msg" id="msg-member-name">Name updated.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMERA -->
+  <div id="screen-camera" class="screen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back
+      </button>
+      <div class="mode-badge" id="mode-badge"><div class="dot"></div><span id="mode-label"></span></div>
+    </div>
+    <div class="section">
+      <div class="sec-lbl">Step 1 — point camera at product</div>
+      <div class="camera-box">
+        <div class="cam-ph" id="cam-ph">
+          <div class="cam-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <p style="font-size:14px;color:white;font-weight:500;">Camera opens here</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.6);">Tap a button below to start</p>
+        </div>
+        <video id="cam-video" autoplay playsinline style="display:none;width:100%;"></video>
+        <canvas id="cam-canvas" style="display:none;"></canvas>
+        <div class="scan-overlay" id="scan-overlay" style="display:none;">
+          <div class="scan-frame"></div><div class="scan-line"></div>
+          <div class="scan-status"><span id="scan-txt">Scanning...</span></div>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" onchange="handleUpload(event)">
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleUpload(event)">
+      <div class="btn-row">
+        <button class="btn primary" id="live-btn" onclick="startScan()">Start live scan</button>
+        <button class="btn" onclick="document.getElementById('fileInput').click()">Upload image</button>
+      </div>
+      <button class="btn" id="stop-btn" onclick="stopScan()" style="display:none;margin-top:8px;">Stop scanning</button>
+    </div>
+    <div class="section" id="pipeline-sec" style="display:none;">
+      <div class="sec-lbl">Lookup pipeline</div>
+      <div class="pipe-steps">
+        <div class="pipe-step" id="p1"><div class="step-ic">1</div><div style="flex:1;">Reading box with AI</div></div>
+        <div class="pipe-step" id="p2"><div class="step-ic">2</div><div style="flex:1;">Checking product database</div></div>
+        <div class="pipe-step" id="p3"><div class="step-ic">3</div><div style="flex:1;">Internet search</div></div>
+        <div class="pipe-step" id="p4"><div class="step-ic">4</div><div style="flex:1;">Updating database</div></div>
+      </div>
+    </div>
+    <div class="section" id="form-sec" style="display:none;">
+      <div class="sec-lbl">Step 2 — review & confirm</div>
+      <div class="fields">
+        <div class="field full"><label>Product name</label><input id="f-name" type="text"></div>
+        <div class="field"><label>Brand</label><input id="f-brand" type="text"></div>
+        <div class="field"><label>Barcode / SKU</label><input id="f-barcode" type="text"></div>
+        <div class="field"><label>Lot number</label><input id="f-lot" type="text"></div>
+        <div class="field"><label>Expiry date</label><input id="f-expiry" type="text" placeholder="YYYY-MM"></div>
+        <div class="field"><label>Quantity</label><input id="f-qty" type="text"></div>
+        <div class="field"><label>Unit</label><input id="f-unit" type="text"></div>
+        <div class="field"><label>Supplier</label><input id="f-supplier" type="text"></div>
+        <div class="field" id="price-field" style="display:none;"><label>Price</label><input id="f-price" type="text" placeholder="e.g. $24.99"></div>
+        <div class="field full"><label>Storage location</label><input id="f-loc" type="text"></div>
+        <div class="field full"><label>Notes</label><textarea id="f-notes"></textarea></div>
+      </div>
+      <div class="chem-toggle-row">
+        <div><div class="chem-lbl">Chemical product</div><div class="chem-sub">Flag for chemical database</div></div>
+        <label class="tog"><input type="checkbox" id="tog-chem"><div class="tog-track"></div><div class="tog-thumb"></div></label>
+      </div>
+      <div class="btn-row" style="margin-top:1rem;">
+        <button class="btn" onclick="clearForm()">Clear</button>
+        <button class="btn primary" onclick="confirmEntry()">Confirm & save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="screen-success" class="screen">
+    <div class="success-wrap">
+      <div class="sicon" id="sicon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div style="font-size:17px;font-weight:500;color:#1a1a18;margin-bottom:6px;" id="s-title"></div>
+      <div id="s-tag"></div>
+      <div style="font-size:13px;color:#888780;margin-bottom:1.5rem;" id="s-sub"></div>
+      <div class="success-actions">
+        <button class="btn" id="exp-btn" onclick="exportExcel()"></button>
+        <button class="btn" id="open-sheet-btn" style="display:none;" onclick="openLink('excel')">Open shared spreadsheet</button>
+        <button class="btn" onclick="scanAnother()">Scan another product</button>
+        <button class="btn" onclick="goHome()">Back to home</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODALS -->
+<div id="edit-modal" style="display:none;" class="modal-bg" onclick="bgClose(event,'edit-modal')">
+  <div class="modal-box">
+    <div class="modal-title">Edit member</div>
+    <div><div class="field-lbl">Full name</div><input class="minput" id="e-name" type="text"></div>
+    <div id="e-role-wrap"><div class="field-lbl">Role</div>
+      <select class="minput" id="e-role"><option value="member">Member</option><option value="admin">Admin</option></select>
+    </div>
+    <div><div class="field-lbl">Status</div>
+      <select class="minput" id="e-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="mbtn primary" onclick="saveEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="transfer-modal" style="display:none;" class="modal-bg" onclick="bgClose(event,'transfer-modal')">
+  <div class="modal-box">
+    <div class="modal-title">Remove yourself as Owner?</div>
+    <div class="modal-body">This is <strong>irreversible</strong>. You will be demoted to Admin.<br><br>Successor: <strong id="transfer-successor-name">—</strong></div>
+    <div class="modal-btns">
+      <button class="mbtn" onclick="closeModal('transfer-modal')">Cancel</button>
+      <button class="mbtn danger" onclick="confirmOwnerTransfer()">Confirm transfer</button>
+    </div>
+  </div>
+</div>
+
+<div id="reset-pin-modal" style="display:none;" class="modal-bg" onclick="bgClose(event,'reset-pin-modal')">
+  <div class="modal-box">
+    <div class="modal-title">Reset your PIN</div>
+    <div><div class="field-lbl">New PIN (4 digits)</div><input class="minput" id="new-pin-input" type="password" maxlength="4" placeholder="••••"></div>
+    <div><div class="field-lbl">Confirm new PIN</div><input class="minput" id="confirm-pin-input" type="password" maxlength="4" placeholder="••••"></div>
+    <div class="pin-error-msg" id="reset-pin-error"></div>
+    <div class="modal-btns">
+      <button class="mbtn" onclick="closeModal('reset-pin-modal')">Cancel</button>
+      <button class="mbtn primary" onclick="saveResetPin()">Save PIN</button>
+    </div>
+  </div>
+</div>
+
+<div id="vote-modal" style="display:none;" class="modal-bg" onclick="bgClose(event,'vote-modal')">
+  <div class="modal-box">
+    <div class="modal-title">Start ownership vote</div>
+    <div class="modal-body" id="vote-modal-body"></div>
+    <div class="modal-btns">
+      <button class="mbtn" onclick="closeModal('vote-modal')">Cancel</button>
+      <button class="mbtn primary" onclick="confirmStartVote()">Start vote</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+var entries=[], currentMode=null, currentUser=null;
+var excelLink='', dbLink='', lastSrc='ai';
+var successor=null, activeVote=null;
+var liveStream=null, scanInt=null, scanning=false;
+var editIdx=null, pinBuffer='', confirmBuffer='';
+var pinVisible={owner:false,admin:false};
+
+var members=[
+  {name:'Lab Owner', role:'owner', status:'active', pin:'1234', firstLogin:false},
+  {name:'Lab Admin', role:'admin', status:'active', pin:'5678', firstLogin:false},
+  {name:'Marie Tremblay', role:'member', status:'active', pin:'9012', firstLogin:true}
+];
+
+function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
+function initials(n){return n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);}
+function delay(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function flashMsg(id){var el=document.getElementById(id);if(!el)return;el.style.display='';setTimeout(function(){el.style.display='none';},3000);}
+function closeModal(id){document.getElementById(id).style.display='none';}
+function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+
+function genUniquePin(){
+  var usedPins=members.map(function(m){return m.pin;});
+  var pin,attempts=0;
+  do{pin=String(Math.floor(1000+Math.random()*9000));attempts++;}
+  while(usedPins.indexOf(pin)!==-1&&attempts<100);
+  return pin;
+}
+
+// PIN login
+function updateDots(prefix,count,state){
+  for(var i=0;i<4;i++){
+    var d=document.getElementById(prefix+i);if(!d)continue;
+    d.className='pin-dot'+(state==='error'?' error':(i<count?' filled':''));
+  }
+}
+function pinKey(k){if(pinBuffer.length>=4)return;pinBuffer+=k;updateDots('ld',pinBuffer.length,'');if(pinBuffer.length===4)setTimeout(attemptLogin,150);}
+function pinDel(){if(!pinBuffer.length)return;pinBuffer=pinBuffer.slice(0,-1);updateDots('ld',pinBuffer.length,'');}
+function attemptLogin(){
+  var matched=null;
+  for(var i=0;i<members.length;i++){if(members[i].pin===pinBuffer&&members[i].status==='active'){matched=members[i];break;}}
+  if(!matched){
+    document.getElementById('pin-error').textContent='Incorrect PIN. Try again.';
+    updateDots('ld',4,'error');setTimeout(function(){updateDots('ld',0,'');pinBuffer='';},700);return;
+  }
+  document.getElementById('pin-error').textContent='';currentUser=matched;pinBuffer='';updateDots('ld',0,'');
+  if(matched.firstLogin){confirmBuffer='';show('screen-confirm-pin');return;}
+  enterApp();
+}
+function confirmKey(k){if(confirmBuffer.length>=4)return;confirmBuffer+=k;updateDots('cd',confirmBuffer.length,'');if(confirmBuffer.length===4)setTimeout(checkConfirm,150);}
+function confirmDel(){if(!confirmBuffer.length)return;confirmBuffer=confirmBuffer.slice(0,-1);updateDots('cd',confirmBuffer.length,'');}
+function checkConfirm(){
+  if(confirmBuffer===currentUser.pin){currentUser.firstLogin=false;confirmBuffer='';updateDots('cd',0,'');document.getElementById('confirm-error').textContent='';enterApp();}
+  else{document.getElementById('confirm-error').textContent='PIN does not match. Try again.';updateDots('cd',4,'error');setTimeout(function(){confirmBuffer='';updateDots('cd',0,'');},700);}
+}
+
+function enterApp(){
+  var badge=document.getElementById('role-badge');
+  var pb=document.getElementById('panel-btn');
+  if(currentUser.role==='owner'){
+    badge.style.display='';badge.className='role-badge owner';badge.textContent='Owner';
+    pb.style.display='';pb.textContent='Admin';
+    updateStatus();populateSuccessorSelect();renderList('owner-member-list','owner');
+    document.getElementById('owner-name-input').value=currentUser.name;
+    updateOwnerPinDisplay();
+  }else if(currentUser.role==='admin'){
+    badge.style.display='';badge.className='role-badge admin';badge.textContent='Admin';
+    pb.style.display='';pb.textContent='Admin';
+    updateStatus();populateVoteCandidates();renderList('admin-member-list','admin');
+    document.getElementById('admin-name-input').value=currentUser.name;
+    updateAdminPinDisplay();
+  }else{
+    badge.style.display='none';
+    pb.style.display='';pb.textContent='Profile';
+    document.getElementById('member-name-input').value=currentUser.name;
+  }
+  showHome();
+}
+
+function showHome(){
+  document.getElementById('panel-btn').classList.remove('active');
+  checkVoteBanner();show('screen-home');
+}
+
+function goHome(){
+  stopScan();currentMode=null;
+  document.getElementById('pipeline-sec').style.display='none';
+  document.getElementById('form-sec').style.display='none';
+  if(!currentUser){show('screen-login');return;}
+  showHome();
+}
+
+function togglePanel(){
+  var btn=document.getElementById('panel-btn');
+  var screenId=currentUser.role==='owner'?'screen-owner-settings':currentUser.role==='admin'?'screen-admin-settings':'screen-member-profile';
+  var isOpen=document.getElementById(screenId).classList.contains('active');
+  if(isOpen){btn.classList.remove('active');showHome();}
+  else{
+    btn.classList.add('active');
+    if(currentUser.role==='owner'){updateOwnerPinDisplay();populateSuccessorSelect();renderList('owner-member-list','owner');checkOwnerVoteBanner();}
+    else if(currentUser.role==='admin'){updateAdminPinDisplay();renderList('admin-member-list','admin');populateVoteCandidates();}
+    else{document.getElementById('member-name-input').value=currentUser.name;}
+    show(screenId);
+  }
+}
+
+// Links
+function saveLink(type){
+  if(type==='excel'){excelLink=document.getElementById('inp-excel').value.trim();document.getElementById('btn-open-excel').style.display=excelLink?'':'none';flashMsg('msg-excel');}
+  else{dbLink=document.getElementById('inp-db').value.trim();document.getElementById('btn-open-db').style.display=dbLink?'':'none';flashMsg('msg-db');}
+  updateStatus();
+}
+function openLink(type){var l=type==='excel'?excelLink:dbLink;if(l)window.open(l,'_blank');}
+function updateStatus(){
+  var ev=excelLink?'Linked':'Not set',ec=excelLink?'linked':'notset';
+  var dv=dbLink?'Linked':'Not set',dc=dbLink?'linked':'notset';
+  ['st-excel','ast-excel'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.textContent=ev;el.className='status-val '+ec;});
+  ['st-db','ast-db'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.textContent=dv;el.className='status-val '+dc;});
+}
+
+// Successor
+function populateSuccessorSelect(){
+  var sel=document.getElementById('successor-select');if(!sel)return;
+  sel.innerHTML='<option value="">Select an Admin...</option>';
+  members.forEach(function(m,i){if(m.role==='admin'&&m.status==='active'){var o=document.createElement('option');o.value=i;o.textContent=m.name;if(successor===i)o.selected=true;sel.appendChild(o);}});
+  var sv=document.getElementById('successor-val');
+  if(sv){sv.textContent=(successor!==null&&members[successor])?members[successor].name:'None set';sv.className='successor-val'+(successor!==null?' set':'');}
+}
+function saveSuccessor(){
+  var val=document.getElementById('successor-select').value;successor=val!==''?parseInt(val):null;
+  populateSuccessorSelect();renderList('owner-member-list','owner');flashMsg('msg-successor');
+}
+
+// Ownership transfer
+function getAutoSuccessor(){
+  if(successor!==null&&members[successor]&&members[successor].status==='active')return successor;
+  for(var i=0;i<members.length;i++){if(members[i].role==='admin'&&members[i].status==='active')return i;}
+  for(var i=0;i<members.length;i++){if(members[i].role==='member'&&members[i].status==='active')return i;}
+  return null;
+}
+function initiateOwnerTransfer(){
+  var sIdx=getAutoSuccessor();
+  document.getElementById('transfer-successor-name').textContent=sIdx!==null?members[sIdx].name:'No eligible successor';
+  document.getElementById('transfer-modal').style.display='flex';
+}
+function confirmOwnerTransfer(){
+  var sIdx=getAutoSuccessor(),oIdx=members.indexOf(currentUser);closeModal('transfer-modal');
+  if(oIdx>=0)members[oIdx].role='admin';if(sIdx!==null)members[sIdx].role='owner';
+  successor=null;currentUser=null;pinBuffer='';updateDots('ld',0,'');
+  document.getElementById('role-badge').style.display='none';document.getElementById('panel-btn').style.display='none';
+  show('screen-login');
+}
+
+// Vote
+function populateVoteCandidates(){
+  var sel=document.getElementById('vote-candidate-select');if(!sel)return;
+  sel.innerHTML='<option value="">Select a candidate...</option>';
+  members.forEach(function(m,i){if(m.role!=='owner'&&m.status==='active'){var o=document.createElement('option');o.value=i;o.textContent=m.name+' ('+m.role+')';sel.appendChild(o);}});
+}
+function startOwnerVote(){
+  var val=document.getElementById('vote-candidate-select').value;if(val===''){alert('Please select a candidate.');return;}
+  var cidx=parseInt(val);
+  document.getElementById('vote-modal-body').innerHTML='You are proposing <strong>'+members[cidx].name+'</strong> as the new Owner.<br><br>All Admins and Members must confirm. The vote expires in <strong>48 hours</strong>.';
+  document.getElementById('vote-modal').dataset.candidate=cidx;document.getElementById('vote-modal').style.display='flex';
+}
+function confirmStartVote(){
+  var cidx=parseInt(document.getElementById('vote-modal').dataset.candidate);
+  activeVote={candidateIdx:cidx,startTime:Date.now(),votes:{}};
+  activeVote.votes[members.indexOf(currentUser)]=true;
+  closeModal('vote-modal');alert('Vote started.');
+}
+function cancelVote(){activeVote=null;document.getElementById('owner-vote-banner').style.display='none';alert('Ownership vote cancelled.');}
+function checkVoteBanner(){
+  var banner=document.getElementById('vote-home-banner');if(!banner||!activeVote||!currentUser)return;
+  var elapsed=Date.now()-activeVote.startTime;
+  if(elapsed>48*60*60*1000){activeVote=null;banner.style.display='none';return;}
+  var myIdx=members.indexOf(currentUser);
+  var hoursLeft=Math.ceil((48*60*60*1000-elapsed)/(60*60*1000));
+  if((currentUser.role==='admin'||currentUser.role==='member')&&activeVote.votes[myIdx]===undefined){
+    banner.style.display='';document.getElementById('vote-home-info').textContent='Proposed: '+members[activeVote.candidateIdx].name+'. '+hoursLeft+'h remaining.';
+  }else{banner.style.display='none';}
+}
+function checkOwnerVoteBanner(){
+  var banner=document.getElementById('owner-vote-banner');if(!banner)return;
+  if(!activeVote){banner.style.display='none';return;}
+  var elapsed=Date.now()-activeVote.startTime;
+  if(elapsed>48*60*60*1000){activeVote=null;banner.style.display='none';return;}
+  var hoursLeft=Math.ceil((48*60*60*1000-elapsed)/(60*60*1000));
+  banner.style.display='';document.getElementById('owner-vote-info').textContent='Proposed: '+members[activeVote.candidateIdx].name+'. '+hoursLeft+'h remaining.';
+}
+function castVote(yes){
+  if(!activeVote)return;var myIdx=members.indexOf(currentUser);activeVote.votes[myIdx]=yes;
+  document.getElementById('vote-home-banner').style.display='none';
+  if(!yes){activeVote=null;alert('You declined. The vote has been cancelled.');return;}
+  var allYes=true,allVoted=true;
+  members.forEach(function(m,i){if(m.role!=='owner'&&m.status==='active'){if(activeVote.votes[i]===undefined)allVoted=false;if(activeVote.votes[i]===false)allYes=false;}});
+  if(allVoted&&allYes){
+    var cand=members[activeVote.candidateIdx];var oIdx=members.findIndex(function(m){return m.role==='owner';});
+    if(oIdx>=0)members[oIdx].role='admin';cand.role='owner';activeVote=null;alert('Ownership transferred to '+cand.name+'.');
+    currentUser=null;pinBuffer='';updateDots('ld',0,'');document.getElementById('role-badge').style.display='none';document.getElementById('panel-btn').style.display='none';show('screen-login');
+  }else{alert('Your vote has been recorded.');}
+}
+
+// PIN management
+function updateOwnerPinDisplay(){var el=document.getElementById('owner-pin-val');if(!el||!currentUser)return;el.textContent=pinVisible.owner?currentUser.pin:'••••';}
+function updateAdminPinDisplay(){var el=document.getElementById('admin-pin-val');if(!el||!currentUser)return;el.textContent=pinVisible.admin?currentUser.pin:'••••';}
+function togglePin(role){
+  pinVisible[role]=!pinVisible[role];var label=pinVisible[role]?'Hide':'Show';
+  if(role==='owner'){updateOwnerPinDisplay();document.getElementById('owner-pin-toggle').textContent=label;}
+  else{updateAdminPinDisplay();document.getElementById('admin-pin-toggle').textContent=label;}
+}
+function openResetPin(){document.getElementById('new-pin-input').value='';document.getElementById('confirm-pin-input').value='';document.getElementById('reset-pin-error').textContent='';document.getElementById('reset-pin-modal').style.display='flex';}
+function saveResetPin(){
+  var np=document.getElementById('new-pin-input').value.trim(),cp=document.getElementById('confirm-pin-input').value.trim();
+  if(np.length!==4||!/^\d{4}$/.test(np)){document.getElementById('reset-pin-error').textContent='PIN must be exactly 4 digits.';return;}
+  if(np!==cp){document.getElementById('reset-pin-error').textContent='PINs do not match.';return;}
+  // Check uniqueness
+  var conflict=members.some(function(m,i){return m!==currentUser&&m.pin===np;});
+  if(conflict){document.getElementById('reset-pin-error').textContent='This PIN is already in use. Please choose another.';return;}
+  currentUser.pin=np;closeModal('reset-pin-modal');
+  if(currentUser.role==='owner')updateOwnerPinDisplay();else updateAdminPinDisplay();
+}
+
+// Self name edit
+function saveSelfName(role){
+  var inputId=role+'-name-input';var val=document.getElementById(inputId).value.trim();if(!val)return;
+  currentUser.name=val;flashMsg('msg-'+role+'-name');
+}
+
+// Team members
+function renderList(listId,context){
+  var list=document.getElementById(listId);if(!list)return;
+  var filtered=members.filter(function(m){return context==='owner'?true:m.role!=='owner';});
+  if(!filtered.length){list.innerHTML='<div style="padding:1rem;font-size:13px;color:#888780;text-align:center;">No members yet.</div>';return;}
+  list.innerHTML=filtered.map(function(m){
+    var i=members.indexOf(m);
+    var canEdit=context==='owner'||(m.role!=='owner'&&m.role!=='admin');
+    var av=m.status==='inactive'?'inactive':m.role;
+    var isSuccessor=successor===i;
+    return '<div class="member-row">'+
+      '<div class="avatar '+av+'">'+initials(m.name)+(isSuccessor?'<div class="successor-dot"></div>':'')+'</div>'+
+      '<div class="minfo">'+
+        '<div class="mname'+(m.status==='inactive'?' inactive':'')+'">'+m.name+'</div>'+
+        '<div class="mmeta">'+(isSuccessor?'<span style="color:#0F6E56;font-weight:500;">Successor · </span>':'')+m.role.charAt(0).toUpperCase()+m.role.slice(1)+'</div>'+
+      '</div>'+
+      '<div class="mbadges"><span class="mb '+m.status+'">'+(m.status==='active'?'Active':'Inactive')+'</span></div>'+
+      '<div class="mact">'+
+        (canEdit
+          ?'<button class="icon-btn" onclick="openEdit('+i+','+(context==='owner')+')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'+
+            '<button class="icon-btn danger" onclick="removeMember('+i+')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>'
+          :'<span style="font-size:12px;color:#c0bfb8;padding:0 4px;">—</span>'
+        )+
+      '</div></div>';
+  }).join('');
+}
+function renderAllLists(){renderList('owner-member-list','owner');renderList('admin-member-list','admin');}
+
+function addMember(prefix){
+  var nameEl=document.getElementById(prefix+'-name');var name=nameEl?nameEl.value.trim():'';if(!name){alert('Please enter a name.');return;}
+  var role=prefix==='o'?(document.getElementById('o-role')?document.getElementById('o-role').value:'member'):'member';
+  var pin=genUniquePin();
+  members.push({name:name,role:role,status:'active',pin:pin,firstLogin:true});
+  var pg=document.getElementById(prefix+'-pin-generated');
+  if(pg){pg.style.display='';pg.innerHTML='PIN for <strong>'+name+'</strong>: <strong>'+pin+'</strong> — share this with them';}
+  if(nameEl)nameEl.value='';
+  renderAllLists();populateSuccessorSelect();populateVoteCandidates();
+}
+
+function removeMember(i){
+  if(members[i].role==='owner'){alert('Cannot remove the Owner.');return;}
+  members.splice(i,1);
+  if(successor!==null){if(successor===i)successor=null;else if(successor>i)successor--;}
+  renderAllLists();populateSuccessorSelect();populateVoteCandidates();
+}
+
+function openEdit(i,isOwnerCtx){
+  editIdx=i;var m=members[i];
+  document.getElementById('e-name').value=m.name;document.getElementById('e-status').value=m.status;
+  var rw=document.getElementById('e-role-wrap');
+  if(isOwnerCtx&&m.role!=='owner'){rw.style.display='';document.getElementById('e-role').value=m.role;}
+  else rw.style.display='none';
+  document.getElementById('edit-modal').style.display='flex';
+}
+function saveEdit(){
+  if(editIdx===null)return;var m=members[editIdx];
+  m.name=document.getElementById('e-name').value.trim()||m.name;m.status=document.getElementById('e-status').value;
+  var rw=document.getElementById('e-role-wrap');if(rw.style.display!=='none')m.role=document.getElementById('e-role').value;
+  closeModal('edit-modal');editIdx=null;renderAllLists();populateSuccessorSelect();
+}
+
+// Scan
+function selectMode(mode){
+  currentMode=mode;document.getElementById('mode-badge').className='mode-badge '+mode;
+  document.getElementById('mode-label').textContent=mode==='receive'?'Receiving stock':'Ordering stock';
+  document.getElementById('price-field').style.display=mode==='order'?'':'none';
+  document.getElementById('panel-btn').classList.remove('active');show('screen-camera');
+}
+function startScan(){
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(stream){
+    liveStream=stream;var v=document.getElementById('cam-video');v.srcObject=stream;v.style.display='';
+    document.getElementById('cam-ph').style.display='none';document.getElementById('scan-overlay').style.display='';
+    document.getElementById('live-btn').style.display='none';document.getElementById('stop-btn').style.display='';
+    scanning=true;document.getElementById('scan-txt').textContent='Scanning — hold steady...';
+    scanInt=setInterval(captureAndAnalyze,4000);setTimeout(captureAndAnalyze,1500);
+  }).catch(function(){alert('Camera not available — use Upload image instead.');});
+}
+function stopScan(){
+  scanning=false;if(scanInt){clearInterval(scanInt);scanInt=null;}
+  if(liveStream){liveStream.getTracks().forEach(function(t){t.stop();});liveStream=null;}
+  var v=document.getElementById('cam-video');if(v){v.style.display='none';v.srcObject=null;}
+  var ph=document.getElementById('cam-ph');if(ph)ph.style.display='';
+  var so=document.getElementById('scan-overlay');if(so)so.style.display='none';
+  var lb=document.getElementById('live-btn');if(lb)lb.style.display='';
+  var sb=document.getElementById('stop-btn');if(sb)sb.style.display='none';
+}
+function captureFrame(){var v=document.getElementById('cam-video'),c=document.getElementById('cam-canvas');c.width=v.videoWidth||640;c.height=v.videoHeight||480;c.getContext('2d').drawImage(v,0,0);return c.toDataURL('image/jpeg',.8).split(',')[1];}
+function captureAndAnalyze(){if(!scanning)return;document.getElementById('scan-txt').textContent='Analyzing...';runPipeline(captureFrame());}
+function handleUpload(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){stopScan();runPipeline(ev.target.result.split(',')[1]);};r.readAsDataURL(f);e.target.value='';}
+
+function runPipeline(img){
+  document.getElementById('pipeline-sec').style.display='';document.getElementById('form-sec').style.display='none';
+  ['p1','p2','p3','p4'].forEach(function(id,i){var el=document.getElementById(id);if(!el)return;el.className='pipe-step';el.querySelector('.step-ic').innerHTML=i+1;});
+  setStep('p1','active');
+  aiAnalyze(img).then(function(aiData){
+    setStep('p1','done');var fd=Object.assign({},aiData);lastSrc='ai';
+    var dbPromise=dbLink?(setStep('p2','active'),delay(800).then(function(){return checkDb(aiData.name||aiData.barcode);})):(setStep('p2','skipped'),Promise.resolve(null));
+    dbPromise.then(function(dbData){
+      if(dbData){fd=mergeData(fd,dbData);lastSrc='db';}if(dbLink)setStep('p2','done');
+      var missing=Object.values(fd).filter(function(v){return !v;}).length;
+      var netPromise=missing>2?(setStep('p3','active'),netSearch(aiData.name||aiData.barcode,currentMode==='order')):(setStep('p3','skipped'),Promise.resolve(null));
+      netPromise.then(function(netData){
+        if(netData){fd=mergeData(fd,netData);if(netData.price)document.getElementById('f-price').value=netData.price;lastSrc=(lastSrc==='db')?'both':'internet';}
+        if(missing>2)setStep('p3','done');
+        setStep('p4','active');delay(400).then(function(){setStep('p4','done');fillForm(fd);document.getElementById('form-sec').style.display='';if(scanning)stopScan();});
+      });
+    });
+  });
+}
+function setStep(id,state){var el=document.getElementById(id);if(!el)return;el.className='pipe-step '+state;var ic=el.querySelector('.step-ic');if(state==='active')ic.innerHTML='<div class="mini-spin"></div>';else if(state==='done')ic.innerHTML='✓';else ic.innerHTML=['p1','p2','p3','p4'].indexOf(id)+1;}
+function aiAnalyze(img){return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},{type:'text',text:'Analyze this lab/pharmacy product box. Return ONLY a JSON object with no markdown: name, brand, barcode, lot, expiry (YYYY-MM), quantity, unit, supplier, notes. Use empty string for missing fields.'}]}]})}).then(function(r){return r.json();}).then(function(d){var t=d.content.map(function(i){return i.text||'';}).join('');return JSON.parse(t.replace(/```json|```/g,'').trim());}).catch(function(){return{};});}
+function checkDb(q){if(!q||!dbLink)return Promise.resolve(null);return delay(600).then(function(){return null;});}
+function netSearch(q,includePrice){if(!q)return Promise.resolve(null);var extra=includePrice?' Also find the current market price and include it as "price" (e.g. "$24.99").':'';return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:'For lab/pharmacy product "'+q+'", return ONLY a JSON object: supplier, brand, unit, notes'+(includePrice?', price':'')+'. Empty string for unknown.'+extra}]})}).then(function(r){return r.json();}).then(function(d){var t=d.content.filter(function(i){return i.type==='text';}).map(function(i){return i.text;}).join('');if(!t)return null;return JSON.parse(t.replace(/```json|```/g,'').trim());}).catch(function(){return null;});}
+function mergeData(b,o){var m=Object.assign({},b);Object.keys(o).forEach(function(k){if(!m[k]&&o[k])m[k]=o[k];});return m;}
+
+function fillForm(d){document.getElementById('f-name').value=d.name||'';document.getElementById('f-brand').value=d.brand||'';document.getElementById('f-barcode').value=d.barcode||'';document.getElementById('f-lot').value=d.lot||'';document.getElementById('f-expiry').value=d.expiry||'';document.getElementById('f-qty').value=d.quantity||'';document.getElementById('f-unit').value=d.unit||'';document.getElementById('f-supplier').value=d.supplier||'';document.getElementById('f-notes').value=d.notes||'';document.getElementById('tog-chem').checked=false;}
+function clearForm(){fillForm({});document.getElementById('f-loc').value='';document.getElementById('f-price').value='';document.getElementById('tog-chem').checked=false;}
+
+function confirmEntry(){
+  var entry={type:currentMode,name:document.getElementById('f-name').value,brand:document.getElementById('f-brand').value,barcode:document.getElementById('f-barcode').value,lot:document.getElementById('f-lot').value,expiry:document.getElementById('f-expiry').value,quantity:document.getElementById('f-qty').value,unit:document.getElementById('f-unit').value,supplier:document.getElementById('f-supplier').value,price:currentMode==='order'?document.getElementById('f-price').value:'',location:document.getElementById('f-loc').value,notes:document.getElementById('f-notes').value,chemical:document.getElementById('tog-chem').checked?'Yes':'No',scannedBy:currentUser?currentUser.name:'',dateAdded:new Date().toISOString().split('T')[0],source:lastSrc};
+  entries.push(entry);
+  document.getElementById('sicon').className='sicon '+currentMode;
+  document.getElementById('s-title').textContent=currentMode==='receive'?'Product received!':'Order recorded!';
+  var labels={ai:'Identified by AI',db:'Matched from database',internet:'Completed via internet',both:'Database + internet'};
+  var colors={ai:'ai',db:'db',internet:'ai',both:'both'};
+  document.getElementById('s-tag').innerHTML='<span class="src-tag '+colors[lastSrc]+'">'+labels[lastSrc]+'</span>';
+  document.getElementById('s-sub').textContent=(entry.name||'Product')+' has been saved.';
+  var eb=document.getElementById('exp-btn');eb.textContent=currentMode==='receive'?'Export received items (.xlsx)':'Export order list (.xlsx)';eb.className='btn '+(currentMode==='receive'?'green':'blue');
+  document.getElementById('open-sheet-btn').style.display=excelLink?'':'none';show('screen-success');
+}
+function scanAnother(){clearForm();document.getElementById('pipeline-sec').style.display='none';document.getElementById('form-sec').style.display='none';show('screen-camera');}
+function exportExcel(){
+  var f=entries.filter(function(e){return e.type===currentMode;});if(!f.length){alert('No items to export yet.');return;}
+  var h=currentMode==='order'?['Type','Product name','Brand','Barcode','Lot','Expiry','Quantity','Unit','Supplier','Price','Location','Chemical','Scanned by','Date','Source']:['Type','Product name','Brand','Barcode','Lot','Expiry','Quantity','Unit','Supplier','Location','Chemical','Scanned by','Date','Source'];
+  var rows=f.map(function(i){var b=[i.type==='receive'?'Received':'Order',i.name,i.brand,i.barcode,i.lot,i.expiry,i.quantity,i.unit,i.supplier];if(currentMode==='order')b.push(i.price);b.push(i.location,i.chemical,i.scannedBy,i.dateAdded,i.source);return b;});
+  var ws=XLSX.utils.aoa_to_sheet([h].concat(rows));ws['!cols']=h.map(function(){return{wch:16};});
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,currentMode==='receive'?'Received':'Orders');
+  XLSX.writeFile(wb,'reorder-'+currentMode+'-'+new Date().toISOString().split('T')[0]+'.xlsx');
+}
+</script>
+</body>
+</html>
