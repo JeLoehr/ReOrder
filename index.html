@@ -1,159 +1,273 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ReOrder</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; min-height: 100vh; padding: 1rem; }
-.app { max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; padding: 1.25rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+/* ── Color schemes ─────────────────────────────────────────────────────── */
+:root {
+  --bg-page:    #f1efe8;
+  --bg-app:     #ffffff;
+  --bg-panel:   #f1efe8;
+  --bg-input:   #ffffff;
+  --text-main:  #1a1a18;
+  --text-muted: #888780;
+  --text-hint:  #b0afa8;
+  --border:     #e5e5e0;
+  --border-md:  #d3d1c7;
+  --accent:     #185FA5;
+  --accent-bg:  #E6F1FB;
+  --pin-filled: #1a1a18;
+  --shadow:     rgba(0,0,0,0.08);
+}
+body.scheme-dark {
+  --bg-page:    #111110;
+  --bg-app:     #1e1e1c;
+  --bg-panel:   #2a2a28;
+  --bg-input:   #2a2a28;
+  --text-main:  #f0efe8;
+  --text-muted: #888780;
+  --text-hint:  #555550;
+  --border:     #333330;
+  --border-md:  #444440;
+  --accent:     #4a90d9;
+  --accent-bg:  #1a2a3a;
+  --pin-filled: #f0efe8;
+  --shadow:     rgba(0,0,0,0.3);
+}
+body.scheme-ocean {
+  --bg-page:    #e8f4f8;
+  --bg-app:     #ffffff;
+  --bg-panel:   #d4edf4;
+  --bg-input:   #ffffff;
+  --text-main:  #0d3349;
+  --text-muted: #5a8a9f;
+  --text-hint:  #9abccc;
+  --border:     #b8d8e4;
+  --border-md:  #8cbdd0;
+  --accent:     #0077a8;
+  --accent-bg:  #d4edf4;
+  --pin-filled: #0d3349;
+  --shadow:     rgba(0,100,150,0.1);
+}
+body.scheme-forest {
+  --bg-page:    #eaf2ea;
+  --bg-app:     #ffffff;
+  --bg-panel:   #d8ecd8;
+  --bg-input:   #ffffff;
+  --text-main:  #1a3320;
+  --text-muted: #5a7a5f;
+  --text-hint:  #9ab89f;
+  --border:     #b8d8bc;
+  --border-md:  #8cbd95;
+  --accent:     #2d7a3a;
+  --accent-bg:  #d8ecd8;
+  --pin-filled: #1a3320;
+  --shadow:     rgba(0,80,20,0.1);
+}
+body.scheme-midnight {
+  --bg-page:    #0f1623;
+  --bg-app:     #1a2234;
+  --bg-panel:   #232f45;
+  --bg-input:   #232f45;
+  --text-main:  #e8eef8;
+  --text-muted: #7a90b0;
+  --text-hint:  #445566;
+  --border:     #2d3d55;
+  --border-md:  #3d5070;
+  --accent:     #5b8dd9;
+  --accent-bg:  #1e2f4a;
+  --pin-filled: #e8eef8;
+  --shadow:     rgba(0,0,0,0.4);
+}
+body.scheme-warm {
+  --bg-page:    #f5efe8;
+  --bg-app:     #fffcf8;
+  --bg-panel:   #f0e8dc;
+  --bg-input:   #fffcf8;
+  --text-main:  #3a2a18;
+  --text-muted: #8a7060;
+  --text-hint:  #baa898;
+  --border:     #e0d0c0;
+  --border-md:  #c8b8a0;
+  --accent:     #c4600a;
+  --accent-bg:  #faeada;
+  --pin-filled: #3a2a18;
+  --shadow:     rgba(80,40,0,0.1);
+}
 
-/* Header */
-.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid #e5e5e0; }
-.header-left h1 { font-size: 22px; font-weight: 600; color: #1a1a18; letter-spacing: -0.3px; }
-.header-left h1 span { color: #185FA5; }
-.header-left p { font-size: 13px; color: #888780; margin-top: 3px; }
+/* ── Base ──────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui,-apple-system,sans-serif; background: var(--bg-page); min-height: 100vh; padding: 1rem; transition: background 0.3s; }
+.app { max-width: 480px; margin: 0 auto; background: var(--bg-app); border-radius: 16px; padding: 1.25rem; box-shadow: 0 1px 4px var(--shadow); }
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--border); }
+.header-left h1 { font-size: 22px; font-weight: 600; color: var(--text-main); letter-spacing: -0.3px; }
+.header-left h1 span { color: var(--accent); }
+.header-left p { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
 .role-badge { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 500; margin-left: 8px; vertical-align: middle; }
 .role-badge.owner { background: #FAEEDA; color: #854F0B; }
 .role-badge.admin { background: #E6F1FB; color: #185FA5; }
 .header-right { display: flex; align-items: center; gap: 8px; }
-.hdr-btn { font-family: inherit; font-size: 12px; padding: 5px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: white; color: #888780; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
-.hdr-btn:hover { background: #f1efe8; }
-.hdr-btn.active { background: #1a1a18; color: white; border-color: #1a1a18; }
+.hdr-btn { font-family: inherit; font-size: 12px; padding: 5px 10px; border: 0.5px solid var(--border-md); border-radius: 8px; background: var(--bg-app); color: var(--text-muted); cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+.hdr-btn:hover { background: var(--bg-panel); }
+.hdr-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
 
-/* Screens */
+/* ── Screens ───────────────────────────────────────────────────────────── */
 .screen { display: none; }
 .screen.active { display: block; }
 
-/* PIN */
+/* ── PIN ───────────────────────────────────────────────────────────────── */
 .pin-wrap { text-align: center; padding: 2rem 0; }
-.pin-title { font-size: 17px; font-weight: 500; color: #1a1a18; margin-bottom: 6px; }
-.pin-sub { font-size: 13px; color: #888780; margin-bottom: 1.5rem; }
+.pin-title { font-size: 17px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; }
+.pin-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; }
 .pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 1.5rem; }
-.pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #d3d1c7; background: white; transition: background 0.15s, border-color 0.15s; }
-.pin-dot.filled { background: #1a1a18; border-color: #1a1a18; }
+.pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--border-md); background: var(--bg-app); transition: background 0.15s, border-color 0.15s; }
+.pin-dot.filled { background: var(--pin-filled); border-color: var(--pin-filled); }
 .pin-dot.error { background: #E24B4A; border-color: #E24B4A; }
 .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 240px; margin: 0 auto; }
-.pin-key { padding: 16px; border-radius: 12px; border: 0.5px solid #e5e5e0; background: white; font-size: 20px; font-weight: 500; color: #1a1a18; cursor: pointer; transition: background 0.1s, transform 0.1s; user-select: none; font-family: inherit; }
-.pin-key:hover { background: #f1efe8; }
+.pin-key { padding: 16px; border-radius: 12px; border: 0.5px solid var(--border); background: var(--bg-app); font-size: 20px; font-weight: 500; color: var(--text-main); cursor: pointer; transition: background 0.1s, transform 0.1s; user-select: none; font-family: inherit; }
+.pin-key:hover { background: var(--bg-panel); }
 .pin-key:active { transform: scale(0.95); }
-.pin-key.del { font-size: 16px; color: #888780; }
+.pin-key.del { font-size: 16px; color: var(--text-muted); }
 .pin-error-msg { font-size: 13px; color: #E24B4A; margin-top: 1rem; min-height: 20px; }
 
-/* Mode cards */
+/* ── Language picker ───────────────────────────────────────────────────── */
+.lang-wrap { text-align: center; padding: 2rem 0; }
+.lang-title { font-size: 17px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; }
+.lang-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; }
+.lang-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 280px; margin: 0 auto; }
+.lang-card { border: 0.5px solid var(--border-md); border-radius: 12px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: background 0.15s, transform 0.1s, border-color 0.15s; }
+.lang-card:hover { background: var(--bg-panel); }
+.lang-card:active { transform: scale(0.97); }
+.lang-card.selected { border-color: var(--accent); background: var(--accent-bg); }
+.lang-card .flag { font-size: 32px; margin-bottom: 8px; }
+.lang-card .lang-label { font-size: 15px; font-weight: 500; color: var(--text-main); }
+.lang-card .lang-native { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+/* ── Color scheme picker ───────────────────────────────────────────────── */
+.scheme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.scheme-swatch { border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s, transform 0.1s; }
+.scheme-swatch:active { transform: scale(0.96); }
+.scheme-swatch.selected { border-color: var(--accent); }
+.scheme-dot { width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 6px; border: 0.5px solid rgba(0,0,0,0.1); }
+.scheme-name { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+/* ── Mode cards ────────────────────────────────────────────────────────── */
 .mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.mode-card { border: 0.5px solid #d3d1c7; border-radius: 12px; padding: 2.5rem 1rem; text-align: center; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.mode-card { border: 0.5px solid var(--border-md); border-radius: 12px; padding: 2.5rem 1rem; text-align: center; cursor: pointer; transition: background 0.15s, transform 0.1s; }
 .mode-card:active { transform: scale(0.97); }
 .mode-card.receive { border-color: #1D9E75; }
 .mode-card.receive:hover { background: #E1F5EE; }
-.mode-card.order { border-color: #185FA5; }
-.mode-card.order:hover { background: #E6F1FB; }
+.mode-card.order { border-color: var(--accent); }
+.mode-card.order:hover { background: var(--accent-bg); }
 .mode-card .icon { font-size: 36px; margin-bottom: 12px; }
-.mode-card .label { font-size: 16px; font-weight: 500; color: #1a1a18; }
+.mode-card .label { font-size: 16px; font-weight: 500; color: var(--text-main); }
 
-/* Top bar */
+/* ── Top bar ───────────────────────────────────────────────────────────── */
 .top-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
-.back-btn { display: flex; align-items: center; gap: 5px; background: none; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 6px 12px; font-size: 13px; color: #888780; cursor: pointer; font-family: inherit; transition: background 0.15s; }
-.back-btn:hover { background: #f1efe8; }
+.back-btn { display: flex; align-items: center; gap: 5px; background: none; border: 0.5px solid var(--border-md); border-radius: 8px; padding: 6px 12px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: background 0.15s; }
+.back-btn:hover { background: var(--bg-panel); }
 .back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 .mode-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; }
 .mode-badge.receive { background: #E1F5EE; color: #0F6E56; }
-.mode-badge.order { background: #E6F1FB; color: #185FA5; }
+.mode-badge.order { background: var(--accent-bg); color: var(--accent); }
 .mode-badge .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .mode-badge.receive .dot { background: #0F6E56; }
-.mode-badge.order .dot { background: #185FA5; }
+.mode-badge.order .dot { background: var(--accent); }
 
-/* Panels */
-.panel { border: 0.5px solid #e5e5e0; border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
-.panel-hdr { background: #f1efe8; padding: 10px 14px; font-size: 12px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 0.5px solid #e5e5e0; }
-.panel-row { padding: 12px 14px; border-bottom: 0.5px solid #e5e5e0; }
+/* ── Panels ────────────────────────────────────────────────────────────── */
+.panel { border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
+.panel-hdr { background: var(--bg-panel); padding: 10px 14px; font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 0.5px solid var(--border); }
+.panel-row { padding: 12px 14px; border-bottom: 0.5px solid var(--border); }
 .panel-row:last-child { border-bottom: none; }
-.row-lbl { font-size: 14px; font-weight: 500; color: #1a1a18; margin-bottom: 3px; }
-.row-sub { font-size: 12px; color: #888780; margin-bottom: 10px; line-height: 1.5; }
-.hint { font-size: 12px; color: #888780; padding: 8px 10px; background: #f1efe8; border-radius: 8px; margin-bottom: 10px; line-height: 1.5; }
-.pinput { font-family: inherit; font-size: 13px; padding: 8px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: white; color: #1a1a18; outline: none; width: 100%; margin-bottom: 8px; }
+.row-lbl { font-size: 14px; font-weight: 500; color: var(--text-main); margin-bottom: 3px; }
+.row-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+.hint { font-size: 12px; color: var(--text-muted); padding: 8px 10px; background: var(--bg-panel); border-radius: 8px; margin-bottom: 10px; line-height: 1.5; }
+.pinput { font-family: inherit; font-size: 13px; padding: 8px 10px; border: 0.5px solid var(--border-md); border-radius: 8px; background: var(--bg-input); color: var(--text-main); outline: none; width: 100%; margin-bottom: 8px; }
 .save-msg { font-size: 12px; color: #0F6E56; display: none; margin-top: 4px; }
-.status-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 0.5px solid #e5e5e0; }
+.status-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 0.5px solid var(--border); }
 .status-row:last-child { border-bottom: none; }
-.status-lbl { font-size: 14px; color: #1a1a18; flex: 1; }
+.status-lbl { font-size: 14px; color: var(--text-main); flex: 1; }
 .status-val { font-size: 12px; font-weight: 500; }
 .status-val.linked { color: #0F6E56; }
-.status-val.notset { color: #888780; }
-.lock-svg { width: 14px; height: 14px; stroke: #888780; fill: none; stroke-width: 2; flex-shrink: 0; }
+.status-val.notset { color: var(--text-muted); }
+.lock-svg { width: 14px; height: 14px; stroke: var(--text-muted); fill: none; stroke-width: 2; flex-shrink: 0; }
 
-/* Members */
+/* ── Members ───────────────────────────────────────────────────────────── */
 .member-list { padding: 0 14px; min-height: 4px; }
-.member-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #e5e5e0; }
+.member-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
 .member-row:last-child { border-bottom: none; }
 .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; position: relative; }
 .avatar.owner { background: #FAEEDA; color: #854F0B; }
 .avatar.admin { background: #E6F1FB; color: #185FA5; }
-.avatar.member { background: #f1efe8; color: #888780; }
-.avatar.inactive { background: #f1efe8; color: #c0bfb8; }
-.successor-dot { position: absolute; bottom: 0; right: 0; width: 9px; height: 9px; border-radius: 50%; background: #0F6E56; border: 1.5px solid white; }
+.avatar.member { background: var(--bg-panel); color: var(--text-muted); }
+.avatar.inactive { background: var(--bg-panel); color: var(--text-hint); }
+.successor-dot { position: absolute; bottom: 0; right: 0; width: 9px; height: 9px; border-radius: 50%; background: #0F6E56; border: 1.5px solid var(--bg-app); }
 .minfo { flex: 1; min-width: 0; }
-.mname { font-size: 14px; font-weight: 500; color: #1a1a18; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mname.inactive { color: #888780; }
-.mmeta { font-size: 12px; color: #888780; margin-top: 2px; }
+.mname { font-size: 14px; font-weight: 500; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mname.inactive { color: var(--text-muted); }
+.mmeta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 .mbadges { display: flex; gap: 5px; flex-shrink: 0; }
 .mb { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; white-space: nowrap; }
 .mb.owner { background: #FAEEDA; color: #854F0B; }
 .mb.admin { background: #E6F1FB; color: #185FA5; }
-.mb.member { background: #f1efe8; color: #888780; }
+.mb.member { background: var(--bg-panel); color: var(--text-muted); }
 .mb.active { background: #EAF3DE; color: #3B6D11; }
-.mb.inactive { background: #f1efe8; color: #888780; }
+.mb.inactive { background: var(--bg-panel); color: var(--text-muted); }
 .mact { display: flex; gap: 4px; }
-.icon-btn { background: none; border: none; cursor: pointer; color: #888780; padding: 4px; border-radius: 6px; transition: background 0.15s; }
-.icon-btn:hover { background: #f1efe8; }
+.icon-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; border-radius: 6px; transition: background 0.15s; }
+.icon-btn:hover { background: var(--bg-panel); }
 .icon-btn.danger:hover { background: #FCEBEB; color: #A32D2D; }
 .icon-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; display: block; }
-.add-form { padding: 12px 14px 14px; border-top: 0.5px solid #e5e5e0; display: flex; flex-direction: column; gap: 8px; }
+.add-form { padding: 12px 14px 14px; border-top: 0.5px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
 .add-row { display: flex; gap: 8px; }
-.add-row input, .add-row select { font-family: inherit; font-size: 13px; padding: 7px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: white; color: #1a1a18; outline: none; width: 100%; }
-.add-btn { padding: 8px 14px; border-radius: 8px; border: none; background: #185FA5; color: #E6F1FB; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; white-space: nowrap; flex-shrink: 0; }
-.pin-generated { font-size: 13px; color: #888780; padding: 8px 10px; background: #f1efe8; border-radius: 8px; display: none; line-height: 1.5; }
-.pin-generated strong { color: #1a1a18; font-weight: 500; }
+.add-row input, .add-row select { font-family: inherit; font-size: 13px; padding: 7px 10px; border: 0.5px solid var(--border-md); border-radius: 8px; background: var(--bg-input); color: var(--text-main); outline: none; width: 100%; }
+.add-btn { padding: 8px 14px; border-radius: 8px; border: none; background: var(--accent); color: white; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; white-space: nowrap; flex-shrink: 0; }
+.pin-generated { font-size: 13px; color: var(--text-muted); padding: 8px 10px; background: var(--bg-panel); border-radius: 8px; display: none; line-height: 1.5; }
+.pin-generated strong { color: var(--text-main); font-weight: 500; }
 
-/* Successor */
-.successor-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 0.5px solid #e5e5e0; }
+/* ── Successor ─────────────────────────────────────────────────────────── */
+.successor-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 0.5px solid var(--border); }
 .successor-row:last-child { border-bottom: none; }
-.successor-lbl { font-size: 14px; color: #1a1a18; }
-.successor-val { font-size: 13px; color: #888780; }
+.successor-lbl { font-size: 14px; color: var(--text-main); }
+.successor-val { font-size: 13px; color: var(--text-muted); }
 .successor-val.set { color: #0F6E56; font-weight: 500; }
 
-/* Vote banner */
+/* ── Vote banner ───────────────────────────────────────────────────────── */
 .vote-banner { background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 10px; padding: 12px 14px; margin-bottom: 1.25rem; font-size: 13px; color: #854F0B; line-height: 1.5; }
 .vote-banner strong { font-weight: 500; }
 
-/* Buttons */
+/* ── Buttons ───────────────────────────────────────────────────────────── */
 .btn-row { display: flex; gap: 8px; margin-top: 8px; }
-.btn { flex: 1; padding: 10px 16px; border-radius: 8px; border: 0.5px solid #d3d1c7; background: transparent; font-size: 14px; font-weight: 500; color: #1a1a18; cursor: pointer; font-family: inherit; transition: background 0.15s, transform 0.1s; }
-.btn:hover { background: #f1efe8; }
+.btn { flex: 1; padding: 10px 16px; border-radius: 8px; border: 0.5px solid var(--border-md); background: transparent; font-size: 14px; font-weight: 500; color: var(--text-main); cursor: pointer; font-family: inherit; transition: background 0.15s, transform 0.1s; }
+.btn:hover { background: var(--bg-panel); }
 .btn:active { transform: scale(0.98); }
-.btn.primary { background: #1a1a18; color: white; border-color: #1a1a18; }
+.btn.primary { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
 .btn.primary:hover { opacity: 0.85; }
 .btn.amber { background: #854F0B; color: #FAEEDA; border-color: #854F0B; }
 .btn.green { background: #0F6E56; color: #E1F5EE; border-color: #0F6E56; }
-.btn.blue { background: #185FA5; color: #E6F1FB; border-color: #185FA5; }
-.btn.danger { background: white; color: #A32D2D; border-color: #F09595; }
+.btn.blue { background: var(--accent); color: white; border-color: var(--accent); }
+.btn.danger { background: var(--bg-app); color: #A32D2D; border-color: #F09595; }
 .btn.danger:hover { background: #FCEBEB; }
 
-/* PIN display */
+/* ── PIN display ───────────────────────────────────────────────────────── */
 .pin-display-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; }
-.pin-display-val { font-size: 22px; font-weight: 500; color: #1a1a18; letter-spacing: 6px; }
+.pin-display-val { font-size: 22px; font-weight: 500; color: var(--text-main); letter-spacing: 6px; }
 .pin-display-actions { display: flex; gap: 8px; }
-.small-btn { font-family: inherit; font-size: 12px; padding: 5px 10px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: white; color: #888780; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
-.small-btn:hover { background: #f1efe8; }
+.small-btn { font-family: inherit; font-size: 12px; padding: 5px 10px; border: 0.5px solid var(--border-md); border-radius: 8px; background: var(--bg-app); color: var(--text-muted); cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+.small-btn:hover { background: var(--bg-panel); }
 
-/* Camera */
+/* ── Camera ────────────────────────────────────────────────────────────── */
 .section { margin-bottom: 1.25rem; }
-.sec-lbl { font-size: 12px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.sec-lbl { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
 .camera-box { border-radius: 12px; overflow: hidden; position: relative; background: #000; min-height: 220px; display: flex; align-items: center; justify-content: center; }
-.camera-box video { width: 100%; display: block; }
+.camera-box video, .camera-box img.captured-frame { width: 100%; display: block; border-radius: 12px; }
 .cam-ph { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 2rem; text-align: center; }
-.cam-icon { width: 44px; height: 44px; background: #E6F1FB; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-.cam-icon svg { width: 22px; height: 22px; stroke: #185FA5; fill: none; stroke-width: 1.5; }
+.cam-icon { width: 44px; height: 44px; background: var(--accent-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.cam-icon svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 1.5; }
 .scan-overlay { position: absolute; inset: 0; pointer-events: none; }
 .scan-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 70%; height: 55%; border: 2px solid rgba(255,255,255,0.7); border-radius: 8px; }
 .scan-frame::before,.scan-frame::after { content:''; position:absolute; width:20px; height:20px; border-color:white; border-style:solid; }
@@ -163,62 +277,64 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
 @keyframes scanline { 0%,100%{top:25%;opacity:.6}50%{top:70%;opacity:1} }
 .scan-status { position:absolute;bottom:12px;left:0;right:0;text-align:center; }
 .scan-status span { background:rgba(0,0,0,.6);color:white;font-size:12px;padding:4px 12px;border-radius:999px; }
+.captured-overlay { position:absolute;top:8px;right:8px; }
+.retake-tag { background:rgba(0,0,0,0.6);color:white;font-size:11px;padding:4px 10px;border-radius:999px; }
 
-/* Pipeline */
+/* ── Pipeline ──────────────────────────────────────────────────────────── */
 .pipe-steps { display:flex;flex-direction:column;gap:6px; }
-.pipe-step { display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;border:0.5px solid #e5e5e0;font-size:13px;color:#888780;transition:all .2s; }
-.pipe-step.active { border-color:#185FA5;color:#185FA5;background:#E6F1FB; }
+.pipe-step { display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);font-size:13px;color:var(--text-muted);transition:all .2s; }
+.pipe-step.active { border-color:var(--accent);color:var(--accent);background:var(--accent-bg); }
 .pipe-step.done { border-color:#1D9E75;color:#0F6E56;background:#E1F5EE; }
 .pipe-step.skipped { opacity:.4; }
-.step-ic { width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:#f1efe8; }
-.pipe-step.active .step-ic { background:#185FA5;color:white; }
+.step-ic { width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:var(--bg-panel); }
+.pipe-step.active .step-ic { background:var(--accent);color:white; }
 .pipe-step.done .step-ic { background:#1D9E75;color:white; }
-.mini-spin { width:12px;height:12px;border:1.5px solid rgba(24,95,165,.3);border-top-color:#185FA5;border-radius:50%;animation:spin .7s linear infinite; }
+.mini-spin { width:12px;height:12px;border:1.5px solid rgba(24,95,165,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite; }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Form */
+/* ── Form ──────────────────────────────────────────────────────────────── */
 .fields { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
 .field { display:flex;flex-direction:column;gap:4px; }
 .field.full { grid-column:1/-1; }
-.field label { font-size:12px;color:#888780;font-weight:500; }
-.field input,.field textarea { font-family:inherit;font-size:14px;padding:8px 10px;border:0.5px solid #d3d1c7;border-radius:8px;background:white;color:#1a1a18;outline:none;width:100%; }
+.field label { font-size:12px;color:var(--text-muted);font-weight:500; }
+.field input,.field textarea { font-family:inherit;font-size:14px;padding:8px 10px;border:0.5px solid var(--border-md);border-radius:8px;background:var(--bg-input);color:var(--text-main);outline:none;width:100%; }
 .field textarea { resize:vertical;min-height:60px; }
-.chem-toggle-row { display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:0.5px solid #e5e5e0;margin-top:4px; }
-.chem-lbl { font-size:14px;color:#1a1a18;font-weight:500; }
-.chem-sub { font-size:12px;color:#888780;margin-top:2px; }
+.chem-toggle-row { display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:0.5px solid var(--border);margin-top:4px; }
+.chem-lbl { font-size:14px;color:var(--text-main);font-weight:500; }
+.chem-sub { font-size:12px;color:var(--text-muted);margin-top:2px; }
 .tog { position:relative;width:28px;height:16px;cursor:pointer;flex-shrink:0; }
 .tog input { opacity:0;width:0;height:0; }
-.tog-track { position:absolute;inset:0;border-radius:999px;background:#d3d1c7;transition:background 0.2s; }
-.tog input:checked + .tog-track { background:#185FA5; }
+.tog-track { position:absolute;inset:0;border-radius:999px;background:var(--border-md);transition:background 0.2s; }
+.tog input:checked + .tog-track { background:var(--accent); }
 .tog-thumb { position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:white;transition:transform 0.2s;pointer-events:none; }
 .tog input:checked ~ .tog-thumb { transform:translateX(12px); }
 
-/* Success */
+/* ── Success ───────────────────────────────────────────────────────────── */
 .success-wrap { text-align:center;padding:2.5rem 1rem; }
 .sicon { width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem; }
 .sicon.receive { background:#E1F5EE; }
-.sicon.order { background:#E6F1FB; }
+.sicon.order { background:var(--accent-bg); }
 .sicon svg { width:26px;height:26px;fill:none;stroke-width:2.5; }
 .sicon.receive svg { stroke:#0F6E56; }
-.sicon.order svg { stroke:#185FA5; }
+.sicon.order svg { stroke:var(--accent); }
 .src-tag { display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;margin-bottom:1rem; }
-.src-tag.ai { background:#E6F1FB;color:#185FA5; }
+.src-tag.ai { background:var(--accent-bg);color:var(--accent); }
 .src-tag.db { background:#E1F5EE;color:#0F6E56; }
 .src-tag.both { background:#FAEEDA;color:#854F0B; }
 .success-actions { display:flex;flex-direction:column;gap:10px; }
 
-/* Modal */
+/* ── Modal ─────────────────────────────────────────────────────────────── */
 .modal-bg { position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem; }
-.modal-box { background:white;border-radius:12px;border:0.5px solid #d3d1c7;padding:1.5rem;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px; }
-.modal-title { font-size:16px;font-weight:500;color:#1a1a18; }
-.modal-body { font-size:13px;color:#888780;line-height:1.6; }
-.modal-body strong { color:#1a1a18;font-weight:500; }
-.field-lbl { font-size:12px;color:#888780;font-weight:500;margin-bottom:3px; }
-.minput { font-family:inherit;font-size:14px;padding:8px 10px;border:0.5px solid #d3d1c7;border-radius:8px;background:white;color:#1a1a18;outline:none;width:100%; }
+.modal-box { background:var(--bg-app);border-radius:12px;border:0.5px solid var(--border-md);padding:1.5rem;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px; }
+.modal-title { font-size:16px;font-weight:500;color:var(--text-main); }
+.modal-body { font-size:13px;color:var(--text-muted);line-height:1.6; }
+.modal-body strong { color:var(--text-main);font-weight:500; }
+.field-lbl { font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:3px; }
+.minput { font-family:inherit;font-size:14px;padding:8px 10px;border:0.5px solid var(--border-md);border-radius:8px;background:var(--bg-input);color:var(--text-main);outline:none;width:100%; }
 .modal-btns { display:flex;gap:8px;margin-top:4px; }
-.mbtn { flex:1;padding:9px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;border:0.5px solid #d3d1c7;background:transparent;color:#1a1a18; }
-.mbtn.primary { background:#1a1a18;color:white;border-color:#1a1a18; }
-.mbtn.danger { background:white;color:#A32D2D;border-color:#F09595; }
+.mbtn { flex:1;padding:9px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;border:0.5px solid var(--border-md);background:transparent;color:var(--text-main); }
+.mbtn.primary { background:var(--text-main);color:var(--bg-app);border-color:var(--text-main); }
+.mbtn.danger { background:var(--bg-app);color:#A32D2D;border-color:#F09595; }
 .mbtn.danger:hover { background:#FCEBEB; }
 #fileInput,#cameraInput { display:none; }
 </style>
@@ -240,263 +356,324 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
   <!-- LOGIN -->
   <div id="screen-login" class="screen active">
     <div class="pin-wrap">
-      <div class="pin-title">Welcome to ReOrder</div>
-      <div class="pin-sub">Enter your PIN to continue</div>
+      <div class="pin-title" data-t="welcome">Welcome to ReOrder</div>
+      <div class="pin-sub" data-t="enterPin">Enter your PIN to continue</div>
       <div class="pin-dots" id="login-dots">
         <div class="pin-dot" id="ld0"></div><div class="pin-dot" id="ld1"></div>
         <div class="pin-dot" id="ld2"></div><div class="pin-dot" id="ld3"></div>
       </div>
       <div class="pin-grid">
-        <button class="pin-key" onclick="pinKey('1')">1</button>
-        <button class="pin-key" onclick="pinKey('2')">2</button>
-        <button class="pin-key" onclick="pinKey('3')">3</button>
-        <button class="pin-key" onclick="pinKey('4')">4</button>
-        <button class="pin-key" onclick="pinKey('5')">5</button>
-        <button class="pin-key" onclick="pinKey('6')">6</button>
-        <button class="pin-key" onclick="pinKey('7')">7</button>
-        <button class="pin-key" onclick="pinKey('8')">8</button>
-        <button class="pin-key" onclick="pinKey('9')">9</button>
-        <button class="pin-key" style="visibility:hidden;"></button>
-        <button class="pin-key" onclick="pinKey('0')">0</button>
-        <button class="pin-key del" onclick="pinDel()">⌫</button>
+        <button class="pin-key" onclick="pinKey('1')">1</button><button class="pin-key" onclick="pinKey('2')">2</button><button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button><button class="pin-key" onclick="pinKey('5')">5</button><button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button><button class="pin-key" onclick="pinKey('8')">8</button><button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key" style="visibility:hidden;"></button><button class="pin-key" onclick="pinKey('0')">0</button><button class="pin-key del" onclick="pinDel()">⌫</button>
       </div>
       <div class="pin-error-msg" id="pin-error"></div>
     </div>
   </div>
 
-  <!-- CONFIRM PIN (first login) -->
+  <!-- CONFIRM PIN -->
   <div id="screen-confirm-pin" class="screen">
     <div class="pin-wrap">
-      <div class="pin-title">Confirm your PIN</div>
-      <div class="pin-sub">Enter your PIN once more to confirm</div>
+      <div class="pin-title" data-t="confirmPin">Confirm your PIN</div>
+      <div class="pin-sub" data-t="confirmPinSub">Enter your PIN once more to confirm</div>
       <div class="pin-dots" id="confirm-dots">
         <div class="pin-dot" id="cd0"></div><div class="pin-dot" id="cd1"></div>
         <div class="pin-dot" id="cd2"></div><div class="pin-dot" id="cd3"></div>
       </div>
       <div class="pin-grid">
-        <button class="pin-key" onclick="confirmKey('1')">1</button>
-        <button class="pin-key" onclick="confirmKey('2')">2</button>
-        <button class="pin-key" onclick="confirmKey('3')">3</button>
-        <button class="pin-key" onclick="confirmKey('4')">4</button>
-        <button class="pin-key" onclick="confirmKey('5')">5</button>
-        <button class="pin-key" onclick="confirmKey('6')">6</button>
-        <button class="pin-key" onclick="confirmKey('7')">7</button>
-        <button class="pin-key" onclick="confirmKey('8')">8</button>
-        <button class="pin-key" onclick="confirmKey('9')">9</button>
-        <button class="pin-key" style="visibility:hidden;"></button>
-        <button class="pin-key" onclick="confirmKey('0')">0</button>
-        <button class="pin-key del" onclick="confirmDel()">⌫</button>
+        <button class="pin-key" onclick="confirmKey('1')">1</button><button class="pin-key" onclick="confirmKey('2')">2</button><button class="pin-key" onclick="confirmKey('3')">3</button>
+        <button class="pin-key" onclick="confirmKey('4')">4</button><button class="pin-key" onclick="confirmKey('5')">5</button><button class="pin-key" onclick="confirmKey('6')">6</button>
+        <button class="pin-key" onclick="confirmKey('7')">7</button><button class="pin-key" onclick="confirmKey('8')">8</button><button class="pin-key" onclick="confirmKey('9')">9</button>
+        <button class="pin-key" style="visibility:hidden;"></button><button class="pin-key" onclick="confirmKey('0')">0</button><button class="pin-key del" onclick="confirmDel()">⌫</button>
       </div>
       <div class="pin-error-msg" id="confirm-error"></div>
     </div>
   </div>
 
-  <!-- HOME (all roles) -->
+  <!-- LANGUAGE PICKER -->
+  <div id="screen-language" class="screen">
+    <div class="lang-wrap">
+      <div class="lang-title" data-t="chooseLanguage">Choose your language</div>
+      <div class="lang-sub" data-t="chooseLanguageSub">You can change this later in your profile</div>
+      <div class="lang-cards">
+        <div class="lang-card" id="lang-en" onclick="selectLanguage('en')">
+          <div class="flag">🇨🇦</div>
+          <div class="lang-label">English</div>
+          <div class="lang-native">English</div>
+        </div>
+        <div class="lang-card" id="lang-fr" onclick="selectLanguage('fr')">
+          <div class="flag">🇫🇷</div>
+          <div class="lang-label">French</div>
+          <div class="lang-native">Français</div>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem;">
+        <button class="btn primary" onclick="confirmLanguage()" data-t="continue" style="max-width:200px;margin:0 auto;display:block;">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
   <div id="screen-home" class="screen">
     <div id="vote-home-banner" style="display:none;" class="vote-banner">
-      <strong>Ownership vote in progress</strong> — <span id="vote-home-info"></span>
+      <strong data-t="voteInProgress">Ownership vote in progress</strong> — <span id="vote-home-info"></span>
       <div style="margin-top:8px;display:flex;gap:8px;">
-        <button class="btn green" onclick="castVote(true)" style="font-size:13px;padding:7px;">Confirm</button>
-        <button class="btn danger" onclick="castVote(false)" style="font-size:13px;padding:7px;">Decline</button>
+        <button class="btn green" onclick="castVote(true)" style="font-size:13px;padding:7px;" data-t="confirm">Confirm</button>
+        <button class="btn danger" onclick="castVote(false)" style="font-size:13px;padding:7px;" data-t="decline">Decline</button>
       </div>
     </div>
     <div class="mode-cards">
       <div class="mode-card receive" onclick="selectMode('receive')">
-        <div class="icon">📦</div><div class="label">Receive</div>
+        <div class="icon">📦</div><div class="label" data-t="receive">Receive</div>
       </div>
       <div class="mode-card order" onclick="selectMode('order')">
-        <div class="icon">🛒</div><div class="label">Order</div>
+        <div class="icon">🛒</div><div class="label" data-t="order">Order</div>
       </div>
     </div>
   </div>
 
   <!-- OWNER ADMIN PANEL -->
   <div id="screen-owner-settings" class="screen">
-    <div style="font-size:15px;font-weight:500;color:#1a1a18;margin-bottom:4px;">Admin panel</div>
-    <div style="font-size:13px;color:#888780;margin-bottom:1.25rem;">Full control over ReOrder and your team</div>
+    <div style="font-size:15px;font-weight:500;color:var(--text-main);margin-bottom:4px;" data-t="adminPanel">Admin panel</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:1.25rem;" data-t="ownerDesc">Full control over ReOrder and your team</div>
 
     <div id="owner-vote-banner" style="display:none;" class="vote-banner">
-      <strong>Active ownership vote</strong> — <span id="owner-vote-info"></span>
+      <strong data-t="activeVote">Active ownership vote</strong> — <span id="owner-vote-info"></span>
       <div style="margin-top:8px;">
-        <button class="btn danger" onclick="cancelVote()" style="font-size:13px;padding:7px;width:100%;">Cancel vote</button>
+        <button class="btn danger" onclick="cancelVote()" style="font-size:13px;padding:7px;width:100%;" data-t="cancelVote">Cancel vote</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-hdr">Google Sheets setup</div>
+      <div class="panel-hdr" data-t="googleSetup">Google Sheets setup</div>
       <div class="panel-row">
-        <div class="row-lbl">Google API key</div>
-        <div class="row-sub">From Google Cloud Console — used to write scan data to your sheet</div>
+        <div class="row-lbl" data-t="apiKey">Google API key</div>
+        <div class="row-sub" data-t="apiKeyDesc">From Google Cloud Console — used to write scan data to your sheet</div>
         <input class="pinput" type="text" id="inp-apikey" placeholder="AIzaSy...">
         <div class="save-msg" id="msg-apikey"></div>
       </div>
       <div class="panel-row">
-        <div class="row-lbl">Inventory sheet ID</div>
-        <div class="row-sub">The long ID from your Google Sheet URL</div>
-        <div class="hint">From your sheet URL: docs.google.com/spreadsheets/d/<strong>SHEET-ID</strong>/edit</div>
+        <div class="row-lbl" data-t="sheetId">Inventory sheet ID</div>
+        <div class="row-sub" data-t="sheetIdDesc">The long ID from your Google Sheet URL</div>
+        <div class="hint" data-t="sheetIdHint">From your sheet URL: docs.google.com/spreadsheets/d/<strong>SHEET-ID</strong>/edit</div>
         <input class="pinput" type="text" id="inp-sheetid" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqp...">
-        <div class="save-msg" id="msg-sheetid"></div>
       </div>
       <div class="panel-row">
-        <div class="row-lbl">Product database sheet ID</div>
-        <div class="row-sub">Optional — known products list checked before AI or internet search</div>
+        <div class="row-lbl" data-t="dbSheetId">Product database sheet ID</div>
+        <div class="row-sub" data-t="dbSheetIdDesc">Optional — known products list</div>
         <input class="pinput" type="text" id="inp-dbsheetid" placeholder="Sheet ID (optional)">
-        <div class="save-msg" id="msg-dbsheetid"></div>
       </div>
-      <div class="panel-row" style="padding-top:8px;">
-        <button class="btn amber" onclick="saveGoogleConfig()" style="width:100%;font-size:13px;padding:8px;">Save configuration</button>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-hdr">Connection status</div>
-      <div class="status-row">
-        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div class="status-lbl">Google API key</div>
-        <div class="status-val notset" id="st-apikey">Not set</div>
-      </div>
-      <div class="status-row">
-        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div class="status-lbl">Inventory sheet</div>
-        <div class="status-val notset" id="st-excel">Not set</div>
-      </div>
-      <div class="status-row">
-        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div class="status-lbl">Product database</div>
-        <div class="status-val notset" id="st-db">Not set</div>
+      <div class="panel-row">
+        <button class="btn amber" onclick="saveGoogleConfig()" style="width:100%;font-size:13px;padding:8px;" data-t="saveConfig">Save configuration</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-hdr">Ownership successor</div>
+      <div class="panel-hdr" data-t="connectionStatus">Connection status</div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl" data-t="googleApiKey">Google API key</div>
+        <div class="status-val notset" id="st-apikey" data-t="notSet">Not set</div>
+      </div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl" data-t="inventorySheet">Inventory sheet</div>
+        <div class="status-val notset" id="st-excel" data-t="notSet">Not set</div>
+      </div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl" data-t="productDatabase">Product database</div>
+        <div class="status-val notset" id="st-db" data-t="notSet">Not set</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr" data-t="ownershipSuccessor">Ownership successor</div>
       <div class="successor-row">
         <div>
-          <div class="successor-lbl">Designated successor</div>
-          <div style="font-size:12px;color:#888780;margin-top:2px;">Promoted to Owner if you leave</div>
+          <div class="successor-lbl" data-t="designatedSuccessor">Designated successor</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" data-t="successorDesc">Promoted to Owner if you leave</div>
         </div>
-        <div class="successor-val" id="successor-val">None set</div>
+        <div class="successor-val" id="successor-val" data-t="noneSet">None set</div>
       </div>
       <div class="panel-row">
-        <select class="pinput" id="successor-select" style="margin-bottom:8px;"><option value="">Select an Admin...</option></select>
-        <button class="btn amber" onclick="saveSuccessor()" style="font-size:13px;padding:8px;width:100%;">Set successor</button>
-        <div class="save-msg" id="msg-successor">Successor saved.</div>
+        <select class="pinput" id="successor-select" style="margin-bottom:8px;"><option value="" data-t="selectAdmin">Select an Admin...</option></select>
+        <button class="btn amber" onclick="saveSuccessor()" style="font-size:13px;padding:8px;width:100%;" data-t="setSuccessor">Set successor</button>
+        <div class="save-msg" id="msg-successor" data-t="successorSaved">Successor saved.</div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-hdr">Team members</div>
+      <div class="panel-hdr" data-t="teamMembers">Team members</div>
       <div class="member-list" id="owner-member-list"></div>
       <div class="add-form">
         <div class="add-row">
-          <input type="text" id="o-name" placeholder="Full name">
-          <select id="o-role"><option value="member">Member</option><option value="admin">Admin</option></select>
+          <input type="text" id="o-name" data-placeholder-t="fullName" placeholder="Full name">
+          <select id="o-role"><option value="member" data-t="member">Member</option><option value="admin" data-t="admin">Admin</option></select>
         </div>
         <div class="pin-generated" id="o-pin-generated"></div>
-        <button class="add-btn" style="width:100%;" onclick="addMember('o')">Add member</button>
+        <button class="add-btn" style="width:100%;" onclick="addMember('o')" data-t="addMember">Add member</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-hdr">My profile</div>
+      <div class="panel-hdr" data-t="myProfile">My profile</div>
       <div class="panel-row">
-        <div class="row-lbl">Display name</div>
+        <div class="row-lbl" data-t="displayName">Display name</div>
         <input class="pinput" type="text" id="owner-name-input">
-        <button class="btn primary" onclick="saveSelfName('owner')" style="font-size:13px;padding:8px;width:100%;">Save name</button>
-        <div class="save-msg" id="msg-owner-name">Name updated.</div>
+        <button class="btn primary" onclick="saveSelfName('owner')" style="font-size:13px;padding:8px;width:100%;" data-t="saveName">Save name</button>
+        <div class="save-msg" id="msg-owner-name" data-t="nameUpdated">Name updated.</div>
       </div>
       <div class="pin-display-row">
         <div class="pin-display-val" id="owner-pin-val">••••</div>
         <div class="pin-display-actions">
-          <button class="small-btn" id="owner-pin-toggle" onclick="togglePin('owner')">Show</button>
-          <button class="small-btn" onclick="openResetPin()">Reset</button>
+          <button class="small-btn" id="owner-pin-toggle" onclick="togglePin('owner')" data-t="show">Show</button>
+          <button class="small-btn" onclick="openResetPin()" data-t="reset">Reset</button>
+        </div>
+      </div>
+      <div class="panel-row" style="padding-top:12px;">
+        <div class="row-lbl" data-t="language">Language</div>
+        <div class="btn-row" style="margin-top:6px;">
+          <button class="btn" id="lang-btn-en-owner" onclick="setLang('en','owner')" style="font-size:13px;padding:8px;">🇨🇦 English</button>
+          <button class="btn" id="lang-btn-fr-owner" onclick="setLang('fr','owner')" style="font-size:13px;padding:8px;">🇫🇷 Français</button>
+        </div>
+      </div>
+      <div class="panel-row">
+        <div class="row-lbl" data-t="colorScheme">Color scheme</div>
+        <div class="scheme-grid" style="margin-top:8px;">
+          <div class="scheme-swatch" onclick="setScheme('default')" id="sw-default"><div class="scheme-dot" style="background:#f1efe8;"></div><div class="scheme-name">Default</div></div>
+          <div class="scheme-swatch" onclick="setScheme('dark')" id="sw-dark"><div class="scheme-dot" style="background:#1e1e1c;"></div><div class="scheme-name">Dark</div></div>
+          <div class="scheme-swatch" onclick="setScheme('ocean')" id="sw-ocean"><div class="scheme-dot" style="background:#d4edf4;"></div><div class="scheme-name">Ocean</div></div>
+          <div class="scheme-swatch" onclick="setScheme('forest')" id="sw-forest"><div class="scheme-dot" style="background:#d8ecd8;"></div><div class="scheme-name">Forest</div></div>
+          <div class="scheme-swatch" onclick="setScheme('midnight')" id="sw-midnight"><div class="scheme-dot" style="background:#1a2234;"></div><div class="scheme-name">Midnight</div></div>
+          <div class="scheme-swatch" onclick="setScheme('warm')" id="sw-warm"><div class="scheme-dot" style="background:#f0e8dc;"></div><div class="scheme-name">Warm</div></div>
         </div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-hdr" style="color:#A32D2D;">Danger zone</div>
+      <div class="panel-hdr" style="color:#A32D2D;" data-t="dangerZone">Danger zone</div>
       <div class="panel-row">
-        <div class="row-lbl">Transfer ownership</div>
-        <div class="row-sub">Irreversible. You will be demoted to Admin.</div>
-        <button class="btn danger" onclick="initiateOwnerTransfer()" style="width:100%;">Remove myself as Owner</button>
+        <div class="row-lbl" data-t="transferOwnership">Transfer ownership</div>
+        <div class="row-sub" data-t="transferDesc">Irreversible. You will be demoted to Admin.</div>
+        <button class="btn danger" onclick="initiateOwnerTransfer()" style="width:100%;" data-t="removeOwner">Remove myself as Owner</button>
       </div>
     </div>
   </div>
 
   <!-- ADMIN PANEL -->
   <div id="screen-admin-settings" class="screen">
-    <div style="font-size:15px;font-weight:500;color:#1a1a18;margin-bottom:4px;">Admin panel</div>
-    <div style="font-size:13px;color:#888780;margin-bottom:1.25rem;">Manage team and configuration</div>
+    <div style="font-size:15px;font-weight:500;color:var(--text-main);margin-bottom:4px;" data-t="adminPanel">Admin panel</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:1.25rem;" data-t="adminDesc">Manage team and configuration</div>
 
     <div class="panel">
-      <div class="panel-hdr">Linked files</div>
+      <div class="panel-hdr" data-t="linkedFiles">Linked files</div>
       <div class="status-row">
         <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div class="status-lbl">Google API key</div>
-        <div class="status-val notset" id="ast-apikey">Not set</div>
+        <div class="status-lbl" data-t="googleApiKey">Google API key</div>
+        <div class="status-val notset" id="ast-apikey" data-t="notSet">Not set</div>
       </div>
       <div class="status-row">
         <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div class="status-lbl">Inventory sheet</div>
-        <div class="status-val notset" id="ast-excel">Not set</div>
+        <div class="status-lbl" data-t="inventorySheet">Inventory sheet</div>
+        <div class="status-val notset" id="ast-excel" data-t="notSet">Not set</div>
       </div>
       <div class="status-row">
         <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div class="status-lbl">Product database</div>
-        <div class="status-val notset" id="ast-db">Not set</div>
+        <div class="status-lbl" data-t="productDatabase">Product database</div>
+        <div class="status-val notset" id="ast-db" data-t="notSet">Not set</div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-hdr">Team members</div>
+      <div class="panel-hdr" data-t="teamMembers">Team members</div>
       <div class="member-list" id="admin-member-list"></div>
       <div class="add-form">
-        <div class="add-row">
-          <input type="text" id="a-name" placeholder="Full name">
-        </div>
+        <div class="add-row"><input type="text" id="a-name" data-placeholder-t="fullName" placeholder="Full name"></div>
         <div class="pin-generated" id="a-pin-generated"></div>
-        <button class="add-btn" style="width:100%;" onclick="addMember('a')">Add member</button>
+        <button class="add-btn" style="width:100%;" onclick="addMember('a')" data-t="addMember">Add member</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-hdr">My profile</div>
+      <div class="panel-hdr" data-t="myProfile">My profile</div>
       <div class="panel-row">
-        <div class="row-lbl">Display name</div>
+        <div class="row-lbl" data-t="displayName">Display name</div>
         <input class="pinput" type="text" id="admin-name-input">
-        <button class="btn primary" onclick="saveSelfName('admin')" style="font-size:13px;padding:8px;width:100%;">Save name</button>
-        <div class="save-msg" id="msg-admin-name">Name updated.</div>
+        <button class="btn primary" onclick="saveSelfName('admin')" style="font-size:13px;padding:8px;width:100%;" data-t="saveName">Save name</button>
+        <div class="save-msg" id="msg-admin-name" data-t="nameUpdated">Name updated.</div>
       </div>
       <div class="pin-display-row">
         <div class="pin-display-val" id="admin-pin-val">••••</div>
         <div class="pin-display-actions">
-          <button class="small-btn" id="admin-pin-toggle" onclick="togglePin('admin')">Show</button>
-          <button class="small-btn" onclick="openResetPin()">Reset</button>
+          <button class="small-btn" id="admin-pin-toggle" onclick="togglePin('admin')" data-t="show">Show</button>
+          <button class="small-btn" onclick="openResetPin()" data-t="reset">Reset</button>
+        </div>
+      </div>
+      <div class="panel-row" style="padding-top:12px;">
+        <div class="row-lbl" data-t="language">Language</div>
+        <div class="btn-row" style="margin-top:6px;">
+          <button class="btn" id="lang-btn-en-admin" onclick="setLang('en','admin')" style="font-size:13px;padding:8px;">🇨🇦 English</button>
+          <button class="btn" id="lang-btn-fr-admin" onclick="setLang('fr','admin')" style="font-size:13px;padding:8px;">🇫🇷 Français</button>
+        </div>
+      </div>
+      <div class="panel-row">
+        <div class="row-lbl" data-t="colorScheme">Color scheme</div>
+        <div class="scheme-grid" style="margin-top:8px;">
+          <div class="scheme-swatch" onclick="setScheme('default')" id="asw-default"><div class="scheme-dot" style="background:#f1efe8;"></div><div class="scheme-name">Default</div></div>
+          <div class="scheme-swatch" onclick="setScheme('dark')" id="asw-dark"><div class="scheme-dot" style="background:#1e1e1c;"></div><div class="scheme-name">Dark</div></div>
+          <div class="scheme-swatch" onclick="setScheme('ocean')" id="asw-ocean"><div class="scheme-dot" style="background:#d4edf4;"></div><div class="scheme-name">Ocean</div></div>
+          <div class="scheme-swatch" onclick="setScheme('forest')" id="asw-forest"><div class="scheme-dot" style="background:#d8ecd8;"></div><div class="scheme-name">Forest</div></div>
+          <div class="scheme-swatch" onclick="setScheme('midnight')" id="asw-midnight"><div class="scheme-dot" style="background:#1a2234;"></div><div class="scheme-name">Midnight</div></div>
+          <div class="scheme-swatch" onclick="setScheme('warm')" id="asw-warm"><div class="scheme-dot" style="background:#f0e8dc;"></div><div class="scheme-name">Warm</div></div>
         </div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-hdr">Ownership vote</div>
+      <div class="panel-hdr" data-t="ownershipVote">Ownership vote</div>
       <div class="panel-row">
-        <div class="row-lbl">Propose a new Owner</div>
-        <div class="row-sub">All Admins and Members must confirm. Vote expires in 48 hours.</div>
-        <select class="pinput" id="vote-candidate-select" style="margin-bottom:8px;"><option value="">Select a candidate...</option></select>
-        <button class="btn blue" onclick="startOwnerVote()" style="width:100%;font-size:13px;padding:8px;">Start ownership vote</button>
+        <div class="row-lbl" data-t="proposeOwner">Propose a new Owner</div>
+        <div class="row-sub" data-t="voteDesc">All Admins and Members must confirm. Vote expires in 48 hours.</div>
+        <select class="pinput" id="vote-candidate-select" style="margin-bottom:8px;"><option value="" data-t="selectCandidate">Select a candidate...</option></select>
+        <button class="btn blue" onclick="startOwnerVote()" style="width:100%;font-size:13px;padding:8px;" data-t="startVote">Start ownership vote</button>
       </div>
     </div>
   </div>
 
   <!-- MEMBER PROFILE -->
   <div id="screen-member-profile" class="screen">
-    <div style="font-size:15px;font-weight:500;color:#1a1a18;margin-bottom:4px;">My profile</div>
-    <div style="font-size:13px;color:#888780;margin-bottom:1.25rem;">Manage your personal settings</div>
+    <div style="font-size:15px;font-weight:500;color:var(--text-main);margin-bottom:4px;" data-t="myProfile">My profile</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:1.25rem;" data-t="profileDesc">Manage your personal settings</div>
     <div class="panel">
-      <div class="panel-hdr">Display name</div>
+      <div class="panel-hdr" data-t="displayName">Display name</div>
       <div class="panel-row">
-        <input class="pinput" type="text" id="member-name-input" placeholder="Your name">
-        <button class="btn primary" onclick="saveSelfName('member')" style="font-size:13px;padding:8px;width:100%;">Save name</button>
-        <div class="save-msg" id="msg-member-name">Name updated.</div>
+        <input class="pinput" type="text" id="member-name-input" data-placeholder-t="yourName" placeholder="Your name">
+        <button class="btn primary" onclick="saveSelfName('member')" style="font-size:13px;padding:8px;width:100%;" data-t="saveName">Save name</button>
+        <div class="save-msg" id="msg-member-name" data-t="nameUpdated">Name updated.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr" data-t="language">Language</div>
+      <div class="panel-row">
+        <div class="btn-row">
+          <button class="btn" id="lang-btn-en-member" onclick="setLang('en','member')" style="font-size:13px;padding:8px;">🇨🇦 English</button>
+          <button class="btn" id="lang-btn-fr-member" onclick="setLang('fr','member')" style="font-size:13px;padding:8px;">🇫🇷 Français</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr" data-t="colorScheme">Color scheme</div>
+      <div style="padding:12px 14px;">
+        <div class="scheme-grid">
+          <div class="scheme-swatch" onclick="setScheme('default')" id="msw-default"><div class="scheme-dot" style="background:#f1efe8;"></div><div class="scheme-name">Default</div></div>
+          <div class="scheme-swatch" onclick="setScheme('dark')" id="msw-dark"><div class="scheme-dot" style="background:#1e1e1c;"></div><div class="scheme-name">Dark</div></div>
+          <div class="scheme-swatch" onclick="setScheme('ocean')" id="msw-ocean"><div class="scheme-dot" style="background:#d4edf4;"></div><div class="scheme-name">Ocean</div></div>
+          <div class="scheme-swatch" onclick="setScheme('forest')" id="msw-forest"><div class="scheme-dot" style="background:#d8ecd8;"></div><div class="scheme-name">Forest</div></div>
+          <div class="scheme-swatch" onclick="setScheme('midnight')" id="msw-midnight"><div class="scheme-dot" style="background:#1a2234;"></div><div class="scheme-name">Midnight</div></div>
+          <div class="scheme-swatch" onclick="setScheme('warm')" id="msw-warm"><div class="scheme-dot" style="background:#f0e8dc;"></div><div class="scheme-name">Warm</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -505,70 +682,70 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
   <div id="screen-camera" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="goHome()">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span data-t="back">Back</span>
       </button>
       <div class="mode-badge" id="mode-badge"><div class="dot"></div><span id="mode-label"></span></div>
     </div>
     <div class="section">
-      <div class="sec-lbl">Step 1 — point camera at product</div>
-      <div class="camera-box">
+      <div class="sec-lbl" data-t="step1">Step 1 — point camera at product</div>
+      <div class="camera-box" id="camera-box">
         <div class="cam-ph" id="cam-ph">
           <div class="cam-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-          <p style="font-size:14px;color:white;font-weight:500;">Camera opens here</p>
-          <p style="font-size:12px;color:rgba(255,255,255,0.6);">Tap a button below to start</p>
+          <p style="font-size:14px;color:white;font-weight:500;" data-t="cameraOpensHere">Camera opens here</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.6);" data-t="tapButtonBelow">Tap a button below to start</p>
         </div>
         <video id="cam-video" autoplay playsinline style="display:none;width:100%;"></video>
         <canvas id="cam-canvas" style="display:none;"></canvas>
         <div class="scan-overlay" id="scan-overlay" style="display:none;">
           <div class="scan-frame"></div><div class="scan-line"></div>
-          <div class="scan-status"><span id="scan-txt">Frame the box and tap Capture</span></div>
+          <div class="scan-status"><span id="scan-txt" data-t="frameTheBox">Frame the box and tap Capture</span></div>
         </div>
       </div>
       <input type="file" id="fileInput" accept="image/*" onchange="handleUpload(event)">
       <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleUpload(event)">
       <div class="btn-row" id="btn-row-start">
-        <button class="btn primary" id="live-btn" onclick="startScan()">Start live scan</button>
-        <button class="btn" onclick="document.getElementById('fileInput').click()">Upload image</button>
+        <button class="btn primary" onclick="startScan()" data-t="startLiveScan">Start live scan</button>
+        <button class="btn" onclick="document.getElementById('fileInput').click()" data-t="uploadImage">Upload image</button>
       </div>
       <div class="btn-row" id="btn-row-capture" style="display:none;margin-top:8px;">
-        <button class="btn primary" onclick="captureNow()">Capture</button>
-        <button class="btn" onclick="stopScan()">Cancel</button>
+        <button class="btn primary" onclick="captureNow()" data-t="capture">Capture</button>
+        <button class="btn" onclick="stopScan()" data-t="cancel">Cancel</button>
       </div>
       <div class="btn-row" id="btn-row-retake" style="display:none;margin-top:8px;">
-        <button class="btn" onclick="retakeScan()">Retake</button>
+        <button class="btn" onclick="retakeScan()" data-t="retake">Retake</button>
       </div>
     </div>
     <div class="section" id="pipeline-sec" style="display:none;">
-      <div class="sec-lbl">Lookup pipeline</div>
+      <div class="sec-lbl" data-t="lookupPipeline">Lookup pipeline</div>
       <div class="pipe-steps">
-        <div class="pipe-step" id="p1"><div class="step-ic">1</div><div style="flex:1;">Reading box with AI</div></div>
-        <div class="pipe-step" id="p2"><div class="step-ic">2</div><div style="flex:1;">Checking product database</div></div>
-        <div class="pipe-step" id="p3"><div class="step-ic">3</div><div style="flex:1;">Internet search</div></div>
-        <div class="pipe-step" id="p4"><div class="step-ic">4</div><div style="flex:1;">Updating database</div></div>
+        <div class="pipe-step" id="p1"><div class="step-ic">1</div><div style="flex:1;" data-t="readingBox">Reading box with AI</div></div>
+        <div class="pipe-step" id="p2"><div class="step-ic">2</div><div style="flex:1;" data-t="checkingDb">Checking product database</div></div>
+        <div class="pipe-step" id="p3"><div class="step-ic">3</div><div style="flex:1;" data-t="internetSearch">Internet search</div></div>
+        <div class="pipe-step" id="p4"><div class="step-ic">4</div><div style="flex:1;" data-t="updatingDb">Updating database</div></div>
       </div>
     </div>
     <div class="section" id="form-sec" style="display:none;">
-      <div class="sec-lbl">Step 2 — review & confirm</div>
+      <div class="sec-lbl" data-t="step2">Step 2 — review & confirm</div>
       <div class="fields">
-        <div class="field full"><label>Product name</label><input id="f-name" type="text"></div>
-        <div class="field"><label>Brand</label><input id="f-brand" type="text"></div>
-        <div class="field"><label>Barcode / SKU</label><input id="f-barcode" type="text"></div>
-        <div class="field"><label>Lot number</label><input id="f-lot" type="text"></div>
-        <div class="field"><label>Expiry date</label><input id="f-expiry" type="text" placeholder="YYYY-MM"></div>
-        <div class="field"><label>Quantity</label><input id="f-qty" type="text"></div>
-        <div class="field"><label>Unit</label><input id="f-unit" type="text"></div>
-        <div class="field"><label>Supplier</label><input id="f-supplier" type="text"></div>
-        <div class="field" id="price-field" style="display:none;"><label>Price</label><input id="f-price" type="text" placeholder="e.g. $24.99"></div>
-        <div class="field full"><label>Storage location</label><input id="f-loc" type="text"></div>
-        <div class="field full"><label>Notes</label><textarea id="f-notes"></textarea></div>
+        <div class="field full"><label data-t="productName">Product name</label><input id="f-name" type="text"></div>
+        <div class="field"><label data-t="brand">Brand</label><input id="f-brand" type="text"></div>
+        <div class="field"><label data-t="barcode">Barcode / SKU</label><input id="f-barcode" type="text"></div>
+        <div class="field"><label data-t="lotNumber">Lot number</label><input id="f-lot" type="text"></div>
+        <div class="field"><label data-t="expiryDate">Expiry date</label><input id="f-expiry" type="text" placeholder="YYYY-MM"></div>
+        <div class="field"><label data-t="quantity">Quantity</label><input id="f-qty" type="text"></div>
+        <div class="field"><label data-t="unit">Unit</label><input id="f-unit" type="text"></div>
+        <div class="field"><label data-t="supplier">Supplier</label><input id="f-supplier" type="text"></div>
+        <div class="field" id="price-field" style="display:none;"><label data-t="price">Price</label><input id="f-price" type="text" placeholder="e.g. $24.99"></div>
+        <div class="field full"><label data-t="storageLocation">Storage location</label><input id="f-loc" type="text"></div>
+        <div class="field full"><label data-t="notes">Notes</label><textarea id="f-notes"></textarea></div>
       </div>
       <div class="chem-toggle-row">
-        <div><div class="chem-lbl">Chemical product</div><div class="chem-sub">Flag for chemical database</div></div>
+        <div><div class="chem-lbl" data-t="chemicalProduct">Chemical product</div><div class="chem-sub" data-t="chemicalProductSub">Flag for chemical database</div></div>
         <label class="tog"><input type="checkbox" id="tog-chem"><div class="tog-track"></div><div class="tog-thumb"></div></label>
       </div>
       <div class="btn-row" style="margin-top:1rem;">
-        <button class="btn" onclick="clearForm()">Clear</button>
-        <button class="btn primary" onclick="confirmEntry()">Confirm & save</button>
+        <button class="btn" onclick="clearForm()" data-t="clear">Clear</button>
+        <button class="btn primary" onclick="confirmEntry()" data-t="confirmSave">Confirm & save</button>
       </div>
     </div>
   </div>
@@ -577,15 +754,15 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
   <div id="screen-success" class="screen">
     <div class="success-wrap">
       <div class="sicon" id="sicon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div style="font-size:17px;font-weight:500;color:#1a1a18;margin-bottom:6px;" id="s-title"></div>
+      <div style="font-size:17px;font-weight:500;color:var(--text-main);margin-bottom:6px;" id="s-title"></div>
       <div id="s-tag"></div>
-      <div style="font-size:13px;color:#888780;margin-bottom:6px;" id="s-sub"></div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;" id="s-sub"></div>
       <div style="font-size:12px;color:#0F6E56;margin-bottom:1.5rem;min-height:18px;" id="sheet-write-status"></div>
       <div class="success-actions">
-        <button class="btn" id="open-sheet-btn" style="display:none;" onclick="openLink('excel')">Open Google Sheet</button>
-        <button class="btn" onclick="exportExcel()">Export to Excel (.xlsx)</button>
-        <button class="btn" onclick="scanAnother()">Scan another product</button>
-        <button class="btn" onclick="goHome()">Back to home</button>
+        <button class="btn" id="open-sheet-btn" style="display:none;" onclick="openLink('excel')" data-t="openSheet">Open Google Sheet</button>
+        <button class="btn" onclick="exportExcel()" data-t="exportExcel">Export to Excel (.xlsx)</button>
+        <button class="btn" onclick="scanAnother()" data-t="scanAnother">Scan another product</button>
+        <button class="btn" onclick="goHome()" data-t="backHome">Back to home</button>
       </div>
     </div>
   </div>
@@ -595,142 +772,361 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
 <!-- MODALS -->
 <div id="edit-modal" style="display:none;" class="modal-bg" onclick="bgClose(event,'edit-modal')">
   <div class="modal-box">
-    <div class="modal-title">Edit member</div>
-    <div><div class="field-lbl">Full name</div><input class="minput" id="e-name" type="text"></div>
-    <div id="e-role-wrap"><div class="field-lbl">Role</div>
-      <select class="minput" id="e-role"><option value="member">Member</option><option value="admin">Admin</option></select>
+    <div class="modal-title" data-t="editMember">Edit member</div>
+    <div><div class="field-lbl" data-t="fullName">Full name</div><input class="minput" id="e-name" type="text"></div>
+    <div id="e-role-wrap"><div class="field-lbl" data-t="role">Role</div>
+      <select class="minput" id="e-role"><option value="member" data-t="member">Member</option><option value="admin" data-t="admin">Admin</option></select>
     </div>
-    <div><div class="field-lbl">Status</div>
-      <select class="minput" id="e-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+    <div><div class="field-lbl" data-t="status">Status</div>
+      <select class="minput" id="e-status"><option value="active" data-t="active">Active</option><option value="inactive" data-t="inactive">Inactive</option></select>
     </div>
     <div class="modal-btns">
-      <button class="mbtn" onclick="closeModal('edit-modal')">Cancel</button>
-      <button class="mbtn primary" onclick="saveEdit()">Save</button>
+      <button class="mbtn" onclick="closeModal('edit-modal')" data-t="cancel">Cancel</button>
+      <button class="mbtn primary" onclick="saveEdit()" data-t="save">Save</button>
     </div>
   </div>
 </div>
 
 <div id="transfer-modal" style="display:none;" class="modal-bg" onclick="bgClose(event,'transfer-modal')">
   <div class="modal-box">
-    <div class="modal-title">Remove yourself as Owner?</div>
-    <div class="modal-body">This is <strong>irreversible</strong>. You will be demoted to Admin.<br><br>Successor: <strong id="transfer-successor-name">—</strong></div>
+    <div class="modal-title" data-t="removeOwnerTitle">Remove yourself as Owner?</div>
+    <div class="modal-body" data-t="removeOwnerBody">This is <strong>irreversible</strong>. You will be demoted to Admin.<br><br>Successor: <strong id="transfer-successor-name">—</strong></div>
     <div class="modal-btns">
-      <button class="mbtn" onclick="closeModal('transfer-modal')">Cancel</button>
-      <button class="mbtn danger" onclick="confirmOwnerTransfer()">Confirm transfer</button>
+      <button class="mbtn" onclick="closeModal('transfer-modal')" data-t="cancel">Cancel</button>
+      <button class="mbtn danger" onclick="confirmOwnerTransfer()" data-t="confirmTransfer">Confirm transfer</button>
     </div>
   </div>
 </div>
 
 <div id="reset-pin-modal" style="display:none;" class="modal-bg" onclick="bgClose(event,'reset-pin-modal')">
   <div class="modal-box">
-    <div class="modal-title">Reset your PIN</div>
-    <div><div class="field-lbl">New PIN (4 digits)</div><input class="minput" id="new-pin-input" type="password" maxlength="4" placeholder="••••"></div>
-    <div><div class="field-lbl">Confirm new PIN</div><input class="minput" id="confirm-pin-input" type="password" maxlength="4" placeholder="••••"></div>
+    <div class="modal-title" data-t="resetPin">Reset your PIN</div>
+    <div><div class="field-lbl" data-t="newPin">New PIN (4 digits)</div><input class="minput" id="new-pin-input" type="password" maxlength="4" placeholder="••••"></div>
+    <div><div class="field-lbl" data-t="confirmNewPin">Confirm new PIN</div><input class="minput" id="confirm-pin-input" type="password" maxlength="4" placeholder="••••"></div>
     <div class="pin-error-msg" id="reset-pin-error"></div>
     <div class="modal-btns">
-      <button class="mbtn" onclick="closeModal('reset-pin-modal')">Cancel</button>
-      <button class="mbtn primary" onclick="saveResetPin()">Save PIN</button>
+      <button class="mbtn" onclick="closeModal('reset-pin-modal')" data-t="cancel">Cancel</button>
+      <button class="mbtn primary" onclick="saveResetPin()" data-t="savePin">Save PIN</button>
     </div>
   </div>
 </div>
 
 <div id="vote-modal" style="display:none;" class="modal-bg" onclick="bgClose(event,'vote-modal')">
   <div class="modal-box">
-    <div class="modal-title">Start ownership vote</div>
+    <div class="modal-title" data-t="startVoteTitle">Start ownership vote</div>
     <div class="modal-body" id="vote-modal-body"></div>
     <div class="modal-btns">
-      <button class="mbtn" onclick="closeModal('vote-modal')">Cancel</button>
-      <button class="mbtn primary" onclick="confirmStartVote()">Start vote</button>
+      <button class="mbtn" onclick="closeModal('vote-modal')" data-t="cancel">Cancel</button>
+      <button class="mbtn primary" onclick="confirmStartVote()" data-t="startVote">Start vote</button>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+// ── Translations ───────────────────────────────────────────────────────────
+var T = {
+  en: {
+    welcome:'Welcome to ReOrder', enterPin:'Enter your PIN to continue',
+    confirmPin:'Confirm your PIN', confirmPinSub:'Enter your PIN once more to confirm',
+    pinError:'Incorrect PIN. Try again.', pinMismatch:'PIN does not match. Try again.',
+    chooseLanguage:'Choose your language', chooseLanguageSub:'You can change this later in your profile',
+    continue:'Continue', receive:'Receive', order:'Order',
+    adminPanel:'Admin panel', ownerDesc:'Full control over ReOrder and your team',
+    adminDesc:'Manage team and configuration',
+    googleSetup:'Google Sheets setup', apiKey:'Google API key',
+    apiKeyDesc:'From Google Cloud Console — used to write scan data to your sheet',
+    sheetId:'Inventory sheet ID', sheetIdDesc:'The long ID from your Google Sheet URL',
+    sheetIdHint:'From your sheet URL: docs.google.com/spreadsheets/d/SHEET-ID/edit',
+    dbSheetId:'Product database sheet ID', dbSheetIdDesc:'Optional — known products list',
+    saveConfig:'Save configuration', connectionStatus:'Connection status',
+    googleApiKey:'Google API key', inventorySheet:'Inventory sheet',
+    productDatabase:'Product database', notSet:'Not set', linked:'Linked',
+    ownershipSuccessor:'Ownership successor', designatedSuccessor:'Designated successor',
+    successorDesc:'Promoted to Owner if you leave', noneSet:'None set',
+    selectAdmin:'Select an Admin...', setSuccessor:'Set successor', successorSaved:'Successor saved.',
+    teamMembers:'Team members', fullName:'Full name', member:'Member', admin:'Admin',
+    addMember:'Add member', myProfile:'My profile', displayName:'Display name',
+    saveName:'Save name', nameUpdated:'Name updated.', show:'Show', hide:'Hide', reset:'Reset',
+    language:'Language', colorScheme:'Color scheme',
+    dangerZone:'Danger zone', transferOwnership:'Transfer ownership',
+    transferDesc:'Irreversible. You will be demoted to Admin.',
+    removeOwner:'Remove myself as Owner',
+    linkedFiles:'Linked files', ownershipVote:'Ownership vote',
+    proposeOwner:'Propose a new Owner',
+    voteDesc:'All Admins and Members must confirm. Vote expires in 48 hours.',
+    selectCandidate:'Select a candidate...', startVote:'Start ownership vote',
+    profileDesc:'Manage your personal settings', yourName:'Your name',
+    back:'Back', step1:'Step 1 — point camera at product',
+    cameraOpensHere:'Camera opens here', tapButtonBelow:'Tap a button below to start',
+    frameTheBox:'Frame the box and tap Capture', startLiveScan:'Start live scan',
+    uploadImage:'Upload image', capture:'Capture', cancel:'Cancel', retake:'Retake',
+    lookupPipeline:'Lookup pipeline', readingBox:'Reading box with AI',
+    checkingDb:'Checking product database', internetSearch:'Internet search',
+    updatingDb:'Updating database', step2:'Step 2 — review & confirm',
+    productName:'Product name', brand:'Brand', barcode:'Barcode / SKU',
+    lotNumber:'Lot number', expiryDate:'Expiry date', quantity:'Quantity',
+    unit:'Unit', supplier:'Supplier', price:'Price', storageLocation:'Storage location',
+    notes:'Notes', chemicalProduct:'Chemical product', chemicalProductSub:'Flag for chemical database',
+    clear:'Clear', confirmSave:'Confirm & save',
+    productReceived:'Product received!', orderRecorded:'Order recorded!',
+    savedToSheet:'Saved to Google Sheet.', sheetError:'Could not reach sheet — saved locally.',
+    savingToSheet:'Saving to sheet...',
+    openSheet:'Open Google Sheet', exportExcel:'Export to Excel (.xlsx)',
+    scanAnother:'Scan another product', backHome:'Back to home',
+    editMember:'Edit member', role:'Role', status:'Status',
+    active:'Active', inactive:'Inactive', save:'Save',
+    removeOwnerTitle:'Remove yourself as Owner?',
+    removeOwnerBody:'This is irreversible. You will be demoted to Admin.',
+    confirmTransfer:'Confirm transfer', resetPin:'Reset your PIN',
+    newPin:'New PIN (4 digits)', confirmNewPin:'Confirm new PIN', savePin:'Save PIN',
+    pinMustBe4:'PIN must be exactly 4 digits.', pinInUse:'This PIN is already in use.',
+    startVoteTitle:'Start ownership vote',
+    voteInProgress:'Ownership vote in progress', confirm:'Confirm', decline:'Decline',
+    activeVote:'Active ownership vote', cancelVote:'Cancel vote',
+    researchCentre:'Research centre', analyzingBox:'Analyzing...',
+    identifiedByAI:'Identified by AI', matchedFromDb:'Matched from database',
+    completedViaInternet:'Completed via internet', dbPlusInternet:'Database + internet',
+    pinFor:'PIN for', sharePinWith:'— share this with them',
+    configSaved:'Configuration saved.'
+  },
+  fr: {
+    welcome:'Bienvenue dans ReOrder', enterPin:'Entrez votre NIP pour continuer',
+    confirmPin:'Confirmez votre NIP', confirmPinSub:'Entrez votre NIP une fois de plus pour confirmer',
+    pinError:'NIP incorrect. Réessayez.', pinMismatch:'Le NIP ne correspond pas. Réessayez.',
+    chooseLanguage:'Choisissez votre langue', chooseLanguageSub:'Vous pouvez modifier cela plus tard dans votre profil',
+    continue:'Continuer', receive:'Réception', order:'Commande',
+    adminPanel:'Panneau admin', ownerDesc:'Contrôle total sur ReOrder et votre équipe',
+    adminDesc:'Gérer l\'équipe et la configuration',
+    googleSetup:'Configuration Google Sheets', apiKey:'Clé API Google',
+    apiKeyDesc:'Depuis Google Cloud Console — utilisée pour écrire les données dans votre feuille',
+    sheetId:'ID de la feuille d\'inventaire', sheetIdDesc:'L\'ID long depuis l\'URL de votre feuille Google',
+    sheetIdHint:'Depuis l\'URL de votre feuille : docs.google.com/spreadsheets/d/ID-FEUILLE/edit',
+    dbSheetId:'ID de la base de données produits', dbSheetIdDesc:'Optionnel — liste des produits connus',
+    saveConfig:'Enregistrer la configuration', connectionStatus:'État de la connexion',
+    googleApiKey:'Clé API Google', inventorySheet:'Feuille d\'inventaire',
+    productDatabase:'Base de données produits', notSet:'Non configuré', linked:'Lié',
+    ownershipSuccessor:'Successeur', designatedSuccessor:'Successeur désigné',
+    successorDesc:'Promu Propriétaire si vous partez', noneSet:'Aucun désigné',
+    selectAdmin:'Sélectionner un Admin...', setSuccessor:'Définir le successeur', successorSaved:'Successeur enregistré.',
+    teamMembers:'Membres de l\'équipe', fullName:'Nom complet', member:'Membre', admin:'Admin',
+    addMember:'Ajouter un membre', myProfile:'Mon profil', displayName:'Nom affiché',
+    saveName:'Enregistrer le nom', nameUpdated:'Nom mis à jour.', show:'Afficher', hide:'Masquer', reset:'Réinitialiser',
+    language:'Langue', colorScheme:'Thème de couleur',
+    dangerZone:'Zone dangereuse', transferOwnership:'Transférer la propriété',
+    transferDesc:'Irréversible. Vous serez rétrogradé en Admin.',
+    removeOwner:'Me retirer en tant que Propriétaire',
+    linkedFiles:'Fichiers liés', ownershipVote:'Vote de propriété',
+    proposeOwner:'Proposer un nouveau Propriétaire',
+    voteDesc:'Tous les Admins et Membres doivent confirmer. Le vote expire dans 48 heures.',
+    selectCandidate:'Sélectionner un candidat...', startVote:'Démarrer le vote',
+    profileDesc:'Gérer vos paramètres personnels', yourName:'Votre nom',
+    back:'Retour', step1:'Étape 1 — pointez la caméra vers le produit',
+    cameraOpensHere:'La caméra s\'ouvre ici', tapButtonBelow:'Appuyez sur un bouton ci-dessous pour démarrer',
+    frameTheBox:'Cadrez la boîte et appuyez sur Capturer', startLiveScan:'Démarrer le scan',
+    uploadImage:'Télécharger une image', capture:'Capturer', cancel:'Annuler', retake:'Reprendre',
+    lookupPipeline:'Pipeline de recherche', readingBox:'Lecture de la boîte par IA',
+    checkingDb:'Vérification de la base de données', internetSearch:'Recherche internet',
+    updatingDb:'Mise à jour de la base de données', step2:'Étape 2 — vérifier et confirmer',
+    productName:'Nom du produit', brand:'Marque', barcode:'Code-barres / SKU',
+    lotNumber:'Numéro de lot', expiryDate:'Date d\'expiration', quantity:'Quantité',
+    unit:'Unité', supplier:'Fournisseur', price:'Prix', storageLocation:'Lieu de stockage',
+    notes:'Notes', chemicalProduct:'Produit chimique', chemicalProductSub:'Marquer pour la base de données chimique',
+    clear:'Effacer', confirmSave:'Confirmer et enregistrer',
+    productReceived:'Produit reçu !', orderRecorded:'Commande enregistrée !',
+    savedToSheet:'Enregistré dans Google Sheets.', sheetError:'Impossible d\'atteindre la feuille — enregistré localement.',
+    savingToSheet:'Enregistrement...',
+    openSheet:'Ouvrir Google Sheets', exportExcel:'Exporter vers Excel (.xlsx)',
+    scanAnother:'Scanner un autre produit', backHome:'Retour à l\'accueil',
+    editMember:'Modifier le membre', role:'Rôle', status:'Statut',
+    active:'Actif', inactive:'Inactif', save:'Enregistrer',
+    removeOwnerTitle:'Vous retirer en tant que Propriétaire ?',
+    removeOwnerBody:'C\'est irréversible. Vous serez rétrogradé en Admin.',
+    confirmTransfer:'Confirmer le transfert', resetPin:'Réinitialiser votre NIP',
+    newPin:'Nouveau NIP (4 chiffres)', confirmNewPin:'Confirmer le nouveau NIP', savePin:'Enregistrer le NIP',
+    pinMustBe4:'Le NIP doit être exactement 4 chiffres.', pinInUse:'Ce NIP est déjà utilisé.',
+    startVoteTitle:'Démarrer un vote de propriété',
+    voteInProgress:'Vote de propriété en cours', confirm:'Confirmer', decline:'Refuser',
+    activeVote:'Vote de propriété actif', cancelVote:'Annuler le vote',
+    researchCentre:'Centre de recherche', analyzingBox:'Analyse en cours...',
+    identifiedByAI:'Identifié par IA', matchedFromDb:'Trouvé dans la base de données',
+    completedViaInternet:'Complété via internet', dbPlusInternet:'Base de données + internet',
+    pinFor:'NIP pour', sharePinWith:'— partagez-le avec eux',
+    configSaved:'Configuration enregistrée.'
+  }
+};
+
+var currentLang = 'en';
+var currentScheme = 'default';
+
+function t(key){ return (T[currentLang] && T[currentLang][key]) || T['en'][key] || key; }
+
+function applyTranslations(){
+  document.querySelectorAll('[data-t]').forEach(function(el){
+    var key = el.getAttribute('data-t');
+    var val = t(key);
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = val;
+    else if (!el.children.length || el.tagName === 'BUTTON') el.textContent = val;
+    else {
+      // Only update text nodes
+      Array.from(el.childNodes).forEach(function(node){
+        if (node.nodeType === 3 && node.textContent.trim()) node.textContent = val;
+      });
+    }
+  });
+  document.querySelectorAll('[data-placeholder-t]').forEach(function(el){
+    el.placeholder = t(el.getAttribute('data-placeholder-t'));
+  });
+  // Update mode label if visible
+  if (currentMode) {
+    document.getElementById('mode-label').textContent = currentMode === 'receive' ? t('receive') : t('order');
+  }
+  // Update header sub
+  if (currentUser) {
+    document.getElementById('header-sub').textContent = t('researchCentre');
+  }
+}
+
+function setLang(lang, context){
+  currentLang = lang;
+  if (currentUser) currentUser.lang = lang;
+  // Update active buttons
+  ['owner','admin','member'].forEach(function(role){
+    var en = document.getElementById('lang-btn-en-'+role);
+    var fr = document.getElementById('lang-btn-fr-'+role);
+    if(en) en.className = 'btn' + (lang==='en'?' primary':'');
+    if(fr) fr.className = 'btn' + (lang==='fr'?' primary':'');
+  });
+  applyTranslations();
+}
+
+function setScheme(scheme){
+  currentScheme = scheme;
+  if (currentUser) currentUser.scheme = scheme;
+  var schemes = ['default','dark','ocean','forest','midnight','warm'];
+  schemes.forEach(function(s){ document.body.classList.remove('scheme-'+s); });
+  if (scheme !== 'default') document.body.classList.add('scheme-'+scheme);
+  // Update selected swatches
+  ['','a','m'].forEach(function(prefix){
+    schemes.forEach(function(s){
+      var el = document.getElementById(prefix+'sw-'+s);
+      if(el) el.className = 'scheme-swatch' + (s===scheme?' selected':'');
+    });
+  });
+}
+
+// ── State ──────────────────────────────────────────────────────────────────
 var entries=[], currentMode=null, currentUser=null;
 var googleApiKey='', sheetId='', dbSheetId='', lastSrc='ai';
 var sheetHeaderFingerprint=null, columnMap=null;
 var successor=null, activeVote=null;
-var liveStream=null, scanInt=null, scanning=false;
-var editIdx=null, pinBuffer='', confirmBuffer='';
+var liveStream=null, scanning=false;
+var editIdx=null, pinBuffer='', confirmBuffer='', langBuffer='en';
 var pinVisible={owner:false,admin:false};
 
 var members=[
-  {name:'Lab Owner', role:'owner', status:'active', pin:'1234', firstLogin:false},
-  {name:'Lab Admin', role:'admin', status:'active', pin:'5678', firstLogin:false},
-  {name:'Marie Tremblay', role:'member', status:'active', pin:'9012', firstLogin:true}
+  {name:'Lab Owner', role:'owner', status:'active', pin:'1234', firstLogin:false, lang:'en', scheme:'default'},
+  {name:'Lab Admin', role:'admin', status:'active', pin:'5678', firstLogin:false, lang:'en', scheme:'default'},
+  {name:'Marie Tremblay', role:'member', status:'active', pin:'9012', firstLogin:true, lang:'en', scheme:'default'}
 ];
 
-// Sample entries for testing
 var entries=[
   {type:'receive',name:'Acetaminophen 500mg',brand:'Tylenol',barcode:'0300450455',lot:'LOT2024A',expiry:'2026-08',quantity:'100',unit:'tablets',supplier:'McKesson',price:'',location:'Room 3B Shelf 2',notes:'',chemical:'No',scannedBy:'Lab Admin',dateAdded:'2025-03-01',source:'ai'},
   {type:'order',name:'Ethanol 95%',brand:'Fisher Scientific',barcode:'E7023',lot:'LOT2024B',expiry:'2027-01',quantity:'4',unit:'L',supplier:'Fisher Scientific',price:'$42.50',location:'Chemical Storage',notes:'Flammable',chemical:'Yes',scannedBy:'Lab Owner',dateAdded:'2025-03-05',source:'db'},
   {type:'receive',name:'Phosphate Buffered Saline',brand:'Sigma-Aldrich',barcode:'P4417',lot:'LOT2024C',expiry:'2026-12',quantity:'10',unit:'packets',supplier:'Sigma-Aldrich',price:'',location:'Room 3B Shelf 1',notes:'',chemical:'Yes',scannedBy:'Marie Tremblay',dateAdded:'2025-03-10',source:'internet'}
 ];
 
+// ── Utility ────────────────────────────────────────────────────────────────
 function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
 function initials(n){return n.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);}
 function delay(ms){return new Promise(function(r){setTimeout(r,ms);});}
 function flashMsg(id){var el=document.getElementById(id);if(!el)return;el.style.display='';setTimeout(function(){el.style.display='none';},3000);}
 function closeModal(id){document.getElementById(id).style.display='none';}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+function genUniquePin(){var used=members.map(function(m){return m.pin;});var pin,n=0;do{pin=String(Math.floor(1000+Math.random()*9000));n++;}while(used.indexOf(pin)!==-1&&n<100);return pin;}
 
-function genUniquePin(){
-  var usedPins=members.map(function(m){return m.pin;});
-  var pin,attempts=0;
-  do{pin=String(Math.floor(1000+Math.random()*9000));attempts++;}
-  while(usedPins.indexOf(pin)!==-1&&attempts<100);
-  return pin;
-}
-
-// PIN login
-function updateDots(prefix,count,state){
-  for(var i=0;i<4;i++){
-    var d=document.getElementById(prefix+i);if(!d)continue;
-    d.className='pin-dot'+(state==='error'?' error':(i<count?' filled':''));
-  }
-}
+// ── PIN login ──────────────────────────────────────────────────────────────
+function updateDots(prefix,count,state){for(var i=0;i<4;i++){var d=document.getElementById(prefix+i);if(!d)continue;d.className='pin-dot'+(state==='error'?' error':(i<count?' filled':''));}}
 function pinKey(k){if(pinBuffer.length>=4)return;pinBuffer+=k;updateDots('ld',pinBuffer.length,'');if(pinBuffer.length===4)setTimeout(attemptLogin,150);}
 function pinDel(){if(!pinBuffer.length)return;pinBuffer=pinBuffer.slice(0,-1);updateDots('ld',pinBuffer.length,'');}
 function attemptLogin(){
   var matched=null;
   for(var i=0;i<members.length;i++){if(members[i].pin===pinBuffer&&members[i].status==='active'){matched=members[i];break;}}
-  if(!matched){
-    document.getElementById('pin-error').textContent='Incorrect PIN. Try again.';
-    updateDots('ld',4,'error');setTimeout(function(){updateDots('ld',0,'');pinBuffer='';},700);return;
-  }
+  if(!matched){document.getElementById('pin-error').textContent=t('pinError');updateDots('ld',4,'error');setTimeout(function(){updateDots('ld',0,'');pinBuffer='';},700);return;}
   document.getElementById('pin-error').textContent='';currentUser=matched;pinBuffer='';updateDots('ld',0,'');
+  // Apply user's language and scheme
+  currentLang=matched.lang||'en';currentScheme=matched.scheme||'default';
+  setLang(currentLang,null);setScheme(currentScheme);
   if(matched.firstLogin){confirmBuffer='';show('screen-confirm-pin');return;}
   enterApp();
 }
 function confirmKey(k){if(confirmBuffer.length>=4)return;confirmBuffer+=k;updateDots('cd',confirmBuffer.length,'');if(confirmBuffer.length===4)setTimeout(checkConfirm,150);}
 function confirmDel(){if(!confirmBuffer.length)return;confirmBuffer=confirmBuffer.slice(0,-1);updateDots('cd',confirmBuffer.length,'');}
 function checkConfirm(){
-  if(confirmBuffer===currentUser.pin){currentUser.firstLogin=false;confirmBuffer='';updateDots('cd',0,'');document.getElementById('confirm-error').textContent='';enterApp();}
-  else{document.getElementById('confirm-error').textContent='PIN does not match. Try again.';updateDots('cd',4,'error');setTimeout(function(){confirmBuffer='';updateDots('cd',0,'');},700);}
+  if(confirmBuffer===currentUser.pin){currentUser.firstLogin=false;confirmBuffer='';updateDots('cd',0,'');document.getElementById('confirm-error').textContent='';showLanguagePicker();}
+  else{document.getElementById('confirm-error').textContent=t('pinMismatch');updateDots('cd',4,'error');setTimeout(function(){confirmBuffer='';updateDots('cd',0,'');},700);}
 }
 
+// ── Language picker ────────────────────────────────────────────────────────
+function showLanguagePicker(){
+  langBuffer=currentLang;
+  document.getElementById('lang-en').className='lang-card'+(langBuffer==='en'?' selected':'');
+  document.getElementById('lang-fr').className='lang-card'+(langBuffer==='fr'?' selected':'');
+  show('screen-language');
+}
+function selectLanguage(lang){
+  langBuffer=lang;
+  document.getElementById('lang-en').className='lang-card'+(lang==='en'?' selected':'');
+  document.getElementById('lang-fr').className='lang-card'+(lang==='fr'?' selected':'');
+  setLang(lang,null);
+}
+function confirmLanguage(){
+  currentUser.lang=langBuffer;enterApp();
+}
+
+// ── Enter app ──────────────────────────────────────────────────────────────
 function enterApp(){
   var badge=document.getElementById('role-badge');
   var pb=document.getElementById('panel-btn');
   if(currentUser.role==='owner'){
     badge.style.display='';badge.className='role-badge owner';badge.textContent='Owner';
-    pb.style.display='';pb.textContent='Admin';
+    pb.style.display='';pb.textContent=t('adminPanel');
     updateStatus();populateSuccessorSelect();renderList('owner-member-list','owner');
     document.getElementById('owner-name-input').value=currentUser.name;
-    updateOwnerPinDisplay();
+    updateOwnerPinDisplay();updateLangButtons('owner');updateSchemeSwatches();
   }else if(currentUser.role==='admin'){
     badge.style.display='';badge.className='role-badge admin';badge.textContent='Admin';
-    pb.style.display='';pb.textContent='Admin';
+    pb.style.display='';pb.textContent=t('adminPanel');
     updateStatus();populateVoteCandidates();renderList('admin-member-list','admin');
     document.getElementById('admin-name-input').value=currentUser.name;
-    updateAdminPinDisplay();
+    updateAdminPinDisplay();updateLangButtons('admin');updateSchemeSwatches();
   }else{
     badge.style.display='none';
-    pb.style.display='';pb.textContent='Profile';
+    pb.style.display='';pb.textContent=t('myProfile');
     document.getElementById('member-name-input').value=currentUser.name;
+    updateLangButtons('member');updateSchemeSwatches();
   }
   showHome();
+}
+
+function updateLangButtons(role){
+  var lang=currentUser?currentUser.lang||'en':'en';
+  ['owner','admin','member'].forEach(function(r){
+    var en=document.getElementById('lang-btn-en-'+r);var fr=document.getElementById('lang-btn-fr-'+r);
+    if(en)en.className='btn'+(lang==='en'?' primary':'');
+    if(fr)fr.className='btn'+(lang==='fr'?' primary':'');
+  });
+}
+
+function updateSchemeSwatches(){
+  var scheme=currentUser?currentUser.scheme||'default':'default';
+  var schemes=['default','dark','ocean','forest','midnight','warm'];
+  ['','a','m'].forEach(function(prefix){
+    schemes.forEach(function(s){
+      var el=document.getElementById(prefix+'sw-'+s);
+      if(el)el.className='scheme-swatch'+(s===scheme?' selected':'');
+    });
+  });
 }
 
 function showHome(){
@@ -742,6 +1138,7 @@ function goHome(){
   stopScan();currentMode=null;
   document.getElementById('pipeline-sec').style.display='none';
   document.getElementById('form-sec').style.display='none';
+  document.getElementById('btn-row-retake').style.display='none';
   if(!currentUser){show('screen-login');return;}
   showHome();
 }
@@ -753,245 +1150,76 @@ function togglePanel(){
   if(isOpen){btn.classList.remove('active');showHome();}
   else{
     btn.classList.add('active');
-    if(currentUser.role==='owner'){updateOwnerPinDisplay();populateSuccessorSelect();renderList('owner-member-list','owner');checkOwnerVoteBanner();}
-    else if(currentUser.role==='admin'){updateAdminPinDisplay();renderList('admin-member-list','admin');populateVoteCandidates();}
+    if(currentUser.role==='owner'){updateOwnerPinDisplay();populateSuccessorSelect();renderList('owner-member-list','owner');checkOwnerVoteBanner();document.getElementById('owner-name-input').value=currentUser.name;}
+    else if(currentUser.role==='admin'){updateAdminPinDisplay();renderList('admin-member-list','admin');populateVoteCandidates();document.getElementById('admin-name-input').value=currentUser.name;}
     else{document.getElementById('member-name-input').value=currentUser.name;}
+    updateLangButtons(currentUser.role);updateSchemeSwatches();
     show(screenId);
   }
 }
 
-// Links
-// Google Sheets config
+// ── Google Sheets config ───────────────────────────────────────────────────
 function saveGoogleConfig(){
   googleApiKey=document.getElementById('inp-apikey').value.trim();
   sheetId=document.getElementById('inp-sheetid').value.trim();
   dbSheetId=document.getElementById('inp-dbsheetid').value.trim();
-  sheetHeaderFingerprint=null; columnMap=null; // reset on config change
+  sheetHeaderFingerprint=null;columnMap=null;
   updateStatus();
   var msg=document.getElementById('msg-apikey');
-  if(msg){msg.textContent='Configuration saved.';flashMsg('msg-apikey');}
+  if(msg){msg.textContent=t('configSaved');flashMsg('msg-apikey');}
 }
-
-function openLink(type){
-  var id=type==='excel'?sheetId:dbSheetId;
-  if(id)window.open('https://docs.google.com/spreadsheets/d/'+id+'/edit','_blank');
-}
-
+function openLink(type){var id=type==='excel'?sheetId:dbSheetId;if(id)window.open('https://docs.google.com/spreadsheets/d/'+id+'/edit','_blank');}
 function updateStatus(){
-  var ak=googleApiKey?'Linked':'Not set', akc=googleApiKey?'linked':'notset';
-  var ev=sheetId?'Linked':'Not set', ec=sheetId?'linked':'notset';
-  var dv=dbSheetId?'Linked':'Not set', dc=dbSheetId?'linked':'notset';
+  var ak=googleApiKey?t('linked'):t('notSet'),akc=googleApiKey?'linked':'notset';
+  var ev=sheetId?t('linked'):t('notSet'),ec=sheetId?'linked':'notset';
+  var dv=dbSheetId?t('linked'):t('notSet'),dc=dbSheetId?'linked':'notset';
   ['st-apikey','ast-apikey'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.textContent=ak;el.className='status-val '+akc;});
   ['st-excel','ast-excel'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.textContent=ev;el.className='status-val '+ec;});
   ['st-db','ast-db'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.textContent=dv;el.className='status-val '+dc;});
 }
 
-// Google Sheets write
+// ── Google Sheets write ────────────────────────────────────────────────────
 var SHEET_HEADERS=['Type','Product name','Brand','Barcode','Lot','Expiry','Quantity','Unit','Supplier','Price','Location','Chemical','Scanned by','Date received','Date ordered','Source'];
+async function getSheetHeaders(){if(!googleApiKey||!sheetId)return null;try{var r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/Sheet1!1:1?key='+googleApiKey);var d=await r.json();return(d.values&&d.values[0])?d.values[0]:[];}catch(e){return null;}}
+async function ensureHeaders(){var existing=await getSheetHeaders();if(!existing)return false;if(existing.length===0){await writeRow(SHEET_HEADERS);columnMap=buildColumnMap(SHEET_HEADERS);sheetHeaderFingerprint=SHEET_HEADERS.join('|');return true;}var fp=existing.join('|');if(fp!==sheetHeaderFingerprint){columnMap=await aiMapColumns(existing);sheetHeaderFingerprint=fp;var missing=SHEET_HEADERS.filter(function(h){return existing.indexOf(h)===-1;});if(missing.length>0){var nh=existing.concat(missing);await appendCells('Sheet1!'+colLetter(existing.length+1)+'1:'+colLetter(nh.length)+'1',[missing]);sheetHeaderFingerprint=nh.join('|');columnMap=buildColumnMap(nh);}}return true;}
+function buildColumnMap(h){var m={};h.forEach(function(hh,i){m[hh]=i;});return m;}
+async function aiMapColumns(headers){try{var p='Map these headers: '+JSON.stringify(headers)+' to standard fields: '+JSON.stringify(SHEET_HEADERS)+'. Return ONLY JSON where keys are standard fields and values are 0-based index. Use -1 for no match.';var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:p}]})});var d=await r.json();var tx=d.content.map(function(i){return i.text||'';}).join('');return JSON.parse(tx.replace(/```json|```/g,'').trim());}catch(e){return buildColumnMap(headers);}}
+function colLetter(n){var s='';while(n>0){var r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
+async function writeRow(values){if(!googleApiKey||!sheetId)return false;try{await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS&key='+googleApiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:[values]})});return true;}catch(e){return false;}}
+async function appendCells(range,values){if(!googleApiKey||!sheetId)return;await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/'+range+'?valueInputOption=USER_ENTERED&key='+googleApiKey,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:values})});}
+async function writeEntryToSheet(entry){if(!googleApiKey||!sheetId)return false;var ok=await ensureHeaders();if(!ok)return false;var today=entry.dateAdded;var row=new Array(Object.keys(columnMap).length).fill('');function set(field,val){var idx=columnMap[field];if(idx!==undefined&&idx>=0)row[idx]=val||'';}set('Type',entry.type==='receive'?'Received':'Order');set('Product name',entry.name);set('Brand',entry.brand);set('Barcode',entry.barcode);set('Lot',entry.lot);set('Expiry',entry.expiry);set('Quantity',entry.quantity);set('Unit',entry.unit);set('Supplier',entry.supplier);set('Price',entry.type==='order'?entry.price:'');set('Location',entry.location);set('Chemical',entry.chemical);set('Scanned by',entry.scannedBy);set('Date received',entry.type==='receive'?today:'');set('Date ordered',entry.type==='order'?today:'');set('Source',entry.source);return await writeRow(row);}
 
-async function getSheetHeaders(){
-  if(!googleApiKey||!sheetId) return null;
-  try{
-    var url='https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/Sheet1!1:1?key='+googleApiKey;
-    var r=await fetch(url);var d=await r.json();
-    return (d.values&&d.values[0])?d.values[0]:[];
-  }catch(e){return null;}
-}
+// ── Successor ──────────────────────────────────────────────────────────────
+function populateSuccessorSelect(){var sel=document.getElementById('successor-select');if(!sel)return;sel.innerHTML='<option value="">'+t('selectAdmin')+'</option>';members.forEach(function(m,i){if(m.role==='admin'&&m.status==='active'){var o=document.createElement('option');o.value=i;o.textContent=m.name;if(successor===i)o.selected=true;sel.appendChild(o);}});var sv=document.getElementById('successor-val');if(sv){sv.textContent=(successor!==null&&members[successor])?members[successor].name:t('noneSet');sv.className='successor-val'+(successor!==null?' set':'');}}
+function saveSuccessor(){var val=document.getElementById('successor-select').value;successor=val!==''?parseInt(val):null;populateSuccessorSelect();renderList('owner-member-list','owner');flashMsg('msg-successor');}
 
-async function ensureHeaders(){
-  var existing=await getSheetHeaders();
-  if(!existing) return false;
-  // If sheet is empty, write headers
-  if(existing.length===0){
-    await writeRow(SHEET_HEADERS, true);
-    columnMap=buildColumnMap(SHEET_HEADERS);
-    sheetHeaderFingerprint=SHEET_HEADERS.join('|');
-    return true;
-  }
-  var fingerprint=existing.join('|');
-  // If headers changed, re-map using AI
-  if(fingerprint!==sheetHeaderFingerprint){
-    columnMap=await aiMapColumns(existing);
-    sheetHeaderFingerprint=fingerprint;
-    // Add any missing headers
-    var missing=SHEET_HEADERS.filter(function(h){return existing.indexOf(h)===-1;});
-    if(missing.length>0){
-      var newHeaders=existing.concat(missing);
-      var range='Sheet1!'+colLetter(existing.length+1)+'1:'+colLetter(newHeaders.length)+'1';
-      await appendCells(range,[missing]);
-      sheetHeaderFingerprint=newHeaders.join('|');
-      columnMap=buildColumnMap(newHeaders);
-    }
-  }
-  return true;
-}
+// ── Ownership transfer ─────────────────────────────────────────────────────
+function getAutoSuccessor(){if(successor!==null&&members[successor]&&members[successor].status==='active')return successor;for(var i=0;i<members.length;i++){if(members[i].role==='admin'&&members[i].status==='active')return i;}for(var i=0;i<members.length;i++){if(members[i].role==='member'&&members[i].status==='active')return i;}return null;}
+function initiateOwnerTransfer(){var sIdx=getAutoSuccessor();document.getElementById('transfer-successor-name').textContent=sIdx!==null?members[sIdx].name:'No eligible successor';document.getElementById('transfer-modal').style.display='flex';}
+function confirmOwnerTransfer(){var sIdx=getAutoSuccessor(),oIdx=members.indexOf(currentUser);closeModal('transfer-modal');if(oIdx>=0)members[oIdx].role='admin';if(sIdx!==null)members[sIdx].role='owner';successor=null;currentUser=null;pinBuffer='';updateDots('ld',0,'');document.getElementById('role-badge').style.display='none';document.getElementById('panel-btn').style.display='none';show('screen-login');}
 
-function buildColumnMap(headers){
-  var map={};headers.forEach(function(h,i){map[h]=i;});return map;
-}
+// ── Vote ───────────────────────────────────────────────────────────────────
+function populateVoteCandidates(){var sel=document.getElementById('vote-candidate-select');if(!sel)return;sel.innerHTML='<option value="">'+t('selectCandidate')+'</option>';members.forEach(function(m,i){if(m.role!=='owner'&&m.status==='active'){var o=document.createElement('option');o.value=i;o.textContent=m.name+' ('+m.role+')';sel.appendChild(o);}});}
+function startOwnerVote(){var val=document.getElementById('vote-candidate-select').value;if(val===''){alert(t('selectCandidate'));return;}var cidx=parseInt(val);document.getElementById('vote-modal-body').innerHTML='You are proposing <strong>'+members[cidx].name+'</strong> as the new Owner.<br><br>All Admins and Members must confirm. Vote expires in <strong>48 hours</strong>.';document.getElementById('vote-modal').dataset.candidate=cidx;document.getElementById('vote-modal').style.display='flex';}
+function confirmStartVote(){var cidx=parseInt(document.getElementById('vote-modal').dataset.candidate);activeVote={candidateIdx:cidx,startTime:Date.now(),votes:{}};activeVote.votes[members.indexOf(currentUser)]=true;closeModal('vote-modal');alert('Vote started.');}
+function cancelVote(){activeVote=null;document.getElementById('owner-vote-banner').style.display='none';alert(t('cancelVote'));}
+function checkVoteBanner(){var banner=document.getElementById('vote-home-banner');if(!banner||!activeVote||!currentUser)return;var elapsed=Date.now()-activeVote.startTime;if(elapsed>48*60*60*1000){activeVote=null;banner.style.display='none';return;}var myIdx=members.indexOf(currentUser);var hoursLeft=Math.ceil((48*60*60*1000-elapsed)/(60*60*1000));if((currentUser.role==='admin'||currentUser.role==='member')&&activeVote.votes[myIdx]===undefined){banner.style.display='';document.getElementById('vote-home-info').textContent='Proposed: '+members[activeVote.candidateIdx].name+'. '+hoursLeft+'h remaining.';}else{banner.style.display='none';}}
+function checkOwnerVoteBanner(){var banner=document.getElementById('owner-vote-banner');if(!banner)return;if(!activeVote){banner.style.display='none';return;}var elapsed=Date.now()-activeVote.startTime;if(elapsed>48*60*60*1000){activeVote=null;banner.style.display='none';return;}var hoursLeft=Math.ceil((48*60*60*1000-elapsed)/(60*60*1000));banner.style.display='';document.getElementById('owner-vote-info').textContent='Proposed: '+members[activeVote.candidateIdx].name+'. '+hoursLeft+'h remaining.';}
+function castVote(yes){if(!activeVote)return;var myIdx=members.indexOf(currentUser);activeVote.votes[myIdx]=yes;document.getElementById('vote-home-banner').style.display='none';if(!yes){activeVote=null;alert('You declined. The vote has been cancelled.');return;}var allYes=true,allVoted=true;members.forEach(function(m,i){if(m.role!=='owner'&&m.status==='active'){if(activeVote.votes[i]===undefined)allVoted=false;if(activeVote.votes[i]===false)allYes=false;}});if(allVoted&&allYes){var cand=members[activeVote.candidateIdx];var oIdx=members.findIndex(function(m){return m.role==='owner';});if(oIdx>=0)members[oIdx].role='admin';cand.role='owner';activeVote=null;alert('Ownership transferred to '+cand.name+'.');currentUser=null;pinBuffer='';updateDots('ld',0,'');document.getElementById('role-badge').style.display='none';document.getElementById('panel-btn').style.display='none';show('screen-login');}else{alert('Your vote has been recorded.');}}
 
-async function aiMapColumns(headers){
-  // Use AI to map existing headers to known fields
-  try{
-    var prompt='Given these spreadsheet column headers: '+JSON.stringify(headers)+'. Map each to one of these standard fields: '+JSON.stringify(SHEET_HEADERS)+'. Return ONLY a JSON object where keys are standard field names and values are the index (0-based) of the matching header. If no match exists use -1.';
-    var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
-    var d=await r.json();var t=d.content.map(function(i){return i.text||'';}).join('');
-    return JSON.parse(t.replace(/```json|```/g,'').trim());
-  }catch(e){return buildColumnMap(headers);}
-}
-
-function colLetter(n){
-  var s='';while(n>0){var r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;
-}
-
-async function writeRow(values, isHeader){
-  if(!googleApiKey||!sheetId) return false;
-  try{
-    var url='https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS&key='+googleApiKey;
-    await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:[values]})});
-    return true;
-  }catch(e){return false;}
-}
-
-async function appendCells(range, values){
-  if(!googleApiKey||!sheetId) return;
-  var url='https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/'+range+'?valueInputOption=USER_ENTERED&key='+googleApiKey;
-  await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:values})});
-}
-
-async function writeEntryToSheet(entry){
-  if(!googleApiKey||!sheetId){return false;}
-  var ok=await ensureHeaders();if(!ok)return false;
-  var today=entry.dateAdded;
-  var row=new Array(Object.keys(columnMap).length).fill('');
-  function set(field,val){var idx=columnMap[field];if(idx!==undefined&&idx>=0)row[idx]=val||'';}
-  set('Type',entry.type==='receive'?'Received':'Order');
-  set('Product name',entry.name);set('Brand',entry.brand);set('Barcode',entry.barcode);
-  set('Lot',entry.lot);set('Expiry',entry.expiry);set('Quantity',entry.quantity);
-  set('Unit',entry.unit);set('Supplier',entry.supplier);
-  set('Price',entry.type==='order'?entry.price:'');
-  set('Location',entry.location);set('Chemical',entry.chemical);
-  set('Scanned by',entry.scannedBy);
-  set('Date received',entry.type==='receive'?today:'');
-  set('Date ordered',entry.type==='order'?today:'');
-  set('Source',entry.source);
-  return await writeRow(row, false);
-}
-
-// Successor
-function populateSuccessorSelect(){
-  var sel=document.getElementById('successor-select');if(!sel)return;
-  sel.innerHTML='<option value="">Select an Admin...</option>';
-  members.forEach(function(m,i){if(m.role==='admin'&&m.status==='active'){var o=document.createElement('option');o.value=i;o.textContent=m.name;if(successor===i)o.selected=true;sel.appendChild(o);}});
-  var sv=document.getElementById('successor-val');
-  if(sv){sv.textContent=(successor!==null&&members[successor])?members[successor].name:'None set';sv.className='successor-val'+(successor!==null?' set':'');}
-}
-function saveSuccessor(){
-  var val=document.getElementById('successor-select').value;successor=val!==''?parseInt(val):null;
-  populateSuccessorSelect();renderList('owner-member-list','owner');flashMsg('msg-successor');
-}
-
-// Ownership transfer
-function getAutoSuccessor(){
-  if(successor!==null&&members[successor]&&members[successor].status==='active')return successor;
-  for(var i=0;i<members.length;i++){if(members[i].role==='admin'&&members[i].status==='active')return i;}
-  for(var i=0;i<members.length;i++){if(members[i].role==='member'&&members[i].status==='active')return i;}
-  return null;
-}
-function initiateOwnerTransfer(){
-  var sIdx=getAutoSuccessor();
-  document.getElementById('transfer-successor-name').textContent=sIdx!==null?members[sIdx].name:'No eligible successor';
-  document.getElementById('transfer-modal').style.display='flex';
-}
-function confirmOwnerTransfer(){
-  var sIdx=getAutoSuccessor(),oIdx=members.indexOf(currentUser);closeModal('transfer-modal');
-  if(oIdx>=0)members[oIdx].role='admin';if(sIdx!==null)members[sIdx].role='owner';
-  successor=null;currentUser=null;pinBuffer='';updateDots('ld',0,'');
-  document.getElementById('role-badge').style.display='none';document.getElementById('panel-btn').style.display='none';
-  show('screen-login');
-}
-
-// Vote
-function populateVoteCandidates(){
-  var sel=document.getElementById('vote-candidate-select');if(!sel)return;
-  sel.innerHTML='<option value="">Select a candidate...</option>';
-  members.forEach(function(m,i){if(m.role!=='owner'&&m.status==='active'){var o=document.createElement('option');o.value=i;o.textContent=m.name+' ('+m.role+')';sel.appendChild(o);}});
-}
-function startOwnerVote(){
-  var val=document.getElementById('vote-candidate-select').value;if(val===''){alert('Please select a candidate.');return;}
-  var cidx=parseInt(val);
-  document.getElementById('vote-modal-body').innerHTML='You are proposing <strong>'+members[cidx].name+'</strong> as the new Owner.<br><br>All Admins and Members must confirm. The vote expires in <strong>48 hours</strong>.';
-  document.getElementById('vote-modal').dataset.candidate=cidx;document.getElementById('vote-modal').style.display='flex';
-}
-function confirmStartVote(){
-  var cidx=parseInt(document.getElementById('vote-modal').dataset.candidate);
-  activeVote={candidateIdx:cidx,startTime:Date.now(),votes:{}};
-  activeVote.votes[members.indexOf(currentUser)]=true;
-  closeModal('vote-modal');alert('Vote started.');
-}
-function cancelVote(){activeVote=null;document.getElementById('owner-vote-banner').style.display='none';alert('Ownership vote cancelled.');}
-function checkVoteBanner(){
-  var banner=document.getElementById('vote-home-banner');if(!banner||!activeVote||!currentUser)return;
-  var elapsed=Date.now()-activeVote.startTime;
-  if(elapsed>48*60*60*1000){activeVote=null;banner.style.display='none';return;}
-  var myIdx=members.indexOf(currentUser);
-  var hoursLeft=Math.ceil((48*60*60*1000-elapsed)/(60*60*1000));
-  if((currentUser.role==='admin'||currentUser.role==='member')&&activeVote.votes[myIdx]===undefined){
-    banner.style.display='';document.getElementById('vote-home-info').textContent='Proposed: '+members[activeVote.candidateIdx].name+'. '+hoursLeft+'h remaining.';
-  }else{banner.style.display='none';}
-}
-function checkOwnerVoteBanner(){
-  var banner=document.getElementById('owner-vote-banner');if(!banner)return;
-  if(!activeVote){banner.style.display='none';return;}
-  var elapsed=Date.now()-activeVote.startTime;
-  if(elapsed>48*60*60*1000){activeVote=null;banner.style.display='none';return;}
-  var hoursLeft=Math.ceil((48*60*60*1000-elapsed)/(60*60*1000));
-  banner.style.display='';document.getElementById('owner-vote-info').textContent='Proposed: '+members[activeVote.candidateIdx].name+'. '+hoursLeft+'h remaining.';
-}
-function castVote(yes){
-  if(!activeVote)return;var myIdx=members.indexOf(currentUser);activeVote.votes[myIdx]=yes;
-  document.getElementById('vote-home-banner').style.display='none';
-  if(!yes){activeVote=null;alert('You declined. The vote has been cancelled.');return;}
-  var allYes=true,allVoted=true;
-  members.forEach(function(m,i){if(m.role!=='owner'&&m.status==='active'){if(activeVote.votes[i]===undefined)allVoted=false;if(activeVote.votes[i]===false)allYes=false;}});
-  if(allVoted&&allYes){
-    var cand=members[activeVote.candidateIdx];var oIdx=members.findIndex(function(m){return m.role==='owner';});
-    if(oIdx>=0)members[oIdx].role='admin';cand.role='owner';activeVote=null;alert('Ownership transferred to '+cand.name+'.');
-    currentUser=null;pinBuffer='';updateDots('ld',0,'');document.getElementById('role-badge').style.display='none';document.getElementById('panel-btn').style.display='none';show('screen-login');
-  }else{alert('Your vote has been recorded.');}
-}
-
-// PIN management
+// ── PIN management ─────────────────────────────────────────────────────────
 function updateOwnerPinDisplay(){var el=document.getElementById('owner-pin-val');if(!el||!currentUser)return;el.textContent=pinVisible.owner?currentUser.pin:'••••';}
 function updateAdminPinDisplay(){var el=document.getElementById('admin-pin-val');if(!el||!currentUser)return;el.textContent=pinVisible.admin?currentUser.pin:'••••';}
-function togglePin(role){
-  pinVisible[role]=!pinVisible[role];var label=pinVisible[role]?'Hide':'Show';
-  if(role==='owner'){updateOwnerPinDisplay();document.getElementById('owner-pin-toggle').textContent=label;}
-  else{updateAdminPinDisplay();document.getElementById('admin-pin-toggle').textContent=label;}
-}
+function togglePin(role){pinVisible[role]=!pinVisible[role];var label=pinVisible[role]?t('hide'):t('show');if(role==='owner'){updateOwnerPinDisplay();document.getElementById('owner-pin-toggle').textContent=label;}else{updateAdminPinDisplay();document.getElementById('admin-pin-toggle').textContent=label;}}
 function openResetPin(){document.getElementById('new-pin-input').value='';document.getElementById('confirm-pin-input').value='';document.getElementById('reset-pin-error').textContent='';document.getElementById('reset-pin-modal').style.display='flex';}
-function saveResetPin(){
-  var np=document.getElementById('new-pin-input').value.trim(),cp=document.getElementById('confirm-pin-input').value.trim();
-  if(np.length!==4||!/^\d{4}$/.test(np)){document.getElementById('reset-pin-error').textContent='PIN must be exactly 4 digits.';return;}
-  if(np!==cp){document.getElementById('reset-pin-error').textContent='PINs do not match.';return;}
-  // Check uniqueness
-  var conflict=members.some(function(m,i){return m!==currentUser&&m.pin===np;});
-  if(conflict){document.getElementById('reset-pin-error').textContent='This PIN is already in use. Please choose another.';return;}
-  currentUser.pin=np;closeModal('reset-pin-modal');
-  if(currentUser.role==='owner')updateOwnerPinDisplay();else updateAdminPinDisplay();
-}
+function saveResetPin(){var np=document.getElementById('new-pin-input').value.trim(),cp=document.getElementById('confirm-pin-input').value.trim();if(np.length!==4||!/^\d{4}$/.test(np)){document.getElementById('reset-pin-error').textContent=t('pinMustBe4');return;}if(np!==cp){document.getElementById('reset-pin-error').textContent=t('pinMismatch');return;}var conflict=members.some(function(m){return m!==currentUser&&m.pin===np;});if(conflict){document.getElementById('reset-pin-error').textContent=t('pinInUse');return;}currentUser.pin=np;closeModal('reset-pin-modal');if(currentUser.role==='owner')updateOwnerPinDisplay();else updateAdminPinDisplay();}
+function saveSelfName(role){var inputId=role+'-name-input';var val=document.getElementById(inputId).value.trim();if(!val)return;currentUser.name=val;flashMsg('msg-'+role+'-name');}
 
-// Self name edit
-function saveSelfName(role){
-  var inputId=role+'-name-input';var val=document.getElementById(inputId).value.trim();if(!val)return;
-  currentUser.name=val;flashMsg('msg-'+role+'-name');
-}
-
-// Team members
+// ── Team members ───────────────────────────────────────────────────────────
 function renderList(listId,context){
   var list=document.getElementById(listId);if(!list)return;
   var filtered=members.filter(function(m){return context==='owner'?true:m.role!=='owner';});
-  if(!filtered.length){list.innerHTML='<div style="padding:1rem;font-size:13px;color:#888780;text-align:center;">No members yet.</div>';return;}
+  if(!filtered.length){list.innerHTML='<div style="padding:1rem;font-size:13px;color:var(--text-muted);text-align:center;">'+t('addMember')+'</div>';return;}
   list.innerHTML=filtered.map(function(m){
     var i=members.indexOf(m);
     var canEdit=context==='owner'||(m.role!=='owner'&&m.role!=='admin');
@@ -999,122 +1227,85 @@ function renderList(listId,context){
     var isSuccessor=successor===i;
     return '<div class="member-row">'+
       '<div class="avatar '+av+'">'+initials(m.name)+(isSuccessor?'<div class="successor-dot"></div>':'')+'</div>'+
-      '<div class="minfo">'+
-        '<div class="mname'+(m.status==='inactive'?' inactive':'')+'">'+m.name+'</div>'+
-        '<div class="mmeta">'+(isSuccessor?'<span style="color:#0F6E56;font-weight:500;">Successor · </span>':'')+m.role.charAt(0).toUpperCase()+m.role.slice(1)+'</div>'+
-      '</div>'+
-      '<div class="mbadges"><span class="mb '+m.status+'">'+(m.status==='active'?'Active':'Inactive')+'</span></div>'+
+      '<div class="minfo"><div class="mname'+(m.status==='inactive'?' inactive':'')+'">'+m.name+'</div>'+
+      '<div class="mmeta">'+(isSuccessor?'<span style="color:#0F6E56;font-weight:500;">'+t('designatedSuccessor')+' · </span>':'')+m.role.charAt(0).toUpperCase()+m.role.slice(1)+'</div></div>'+
+      '<div class="mbadges"><span class="mb '+m.status+'">'+(m.status==='active'?t('active'):t('inactive'))+'</span></div>'+
       '<div class="mact">'+
         (canEdit
           ?'<button class="icon-btn" onclick="openEdit('+i+','+(context==='owner')+')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'+
             '<button class="icon-btn danger" onclick="removeMember('+i+')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>'
-          :'<span style="font-size:12px;color:#c0bfb8;padding:0 4px;">—</span>'
-        )+
-      '</div></div>';
+          :'<span style="font-size:12px;color:var(--text-hint);padding:0 4px;">—</span>'
+        )+'</div></div>';
   }).join('');
 }
 function renderAllLists(){renderList('owner-member-list','owner');renderList('admin-member-list','admin');}
+function addMember(prefix){var nameEl=document.getElementById(prefix+'-name');var name=nameEl?nameEl.value.trim():'';if(!name){alert(t('fullName'));return;}var role=prefix==='o'?(document.getElementById('o-role')?document.getElementById('o-role').value:'member'):'member';var pin=genUniquePin();members.push({name:name,role:role,status:'active',pin:pin,firstLogin:true,lang:'en',scheme:'default'});var pg=document.getElementById(prefix+'-pin-generated');if(pg){pg.style.display='';pg.innerHTML=t('pinFor')+' <strong>'+name+'</strong>: <strong>'+pin+'</strong> '+t('sharePinWith');}if(nameEl)nameEl.value='';renderAllLists();populateSuccessorSelect();populateVoteCandidates();}
+function removeMember(i){if(members[i].role==='owner'){alert('Cannot remove the Owner.');return;}members.splice(i,1);if(successor!==null){if(successor===i)successor=null;else if(successor>i)successor--;}renderAllLists();populateSuccessorSelect();populateVoteCandidates();}
+function openEdit(i,isOwnerCtx){editIdx=i;var m=members[i];document.getElementById('e-name').value=m.name;document.getElementById('e-status').value=m.status;var rw=document.getElementById('e-role-wrap');if(isOwnerCtx&&m.role!=='owner'){rw.style.display='';document.getElementById('e-role').value=m.role;}else rw.style.display='none';document.getElementById('edit-modal').style.display='flex';}
+function saveEdit(){if(editIdx===null)return;var m=members[editIdx];m.name=document.getElementById('e-name').value.trim()||m.name;m.status=document.getElementById('e-status').value;var rw=document.getElementById('e-role-wrap');if(rw.style.display!=='none')m.role=document.getElementById('e-role').value;closeModal('edit-modal');editIdx=null;renderAllLists();populateSuccessorSelect();}
 
-function addMember(prefix){
-  var nameEl=document.getElementById(prefix+'-name');var name=nameEl?nameEl.value.trim():'';if(!name){alert('Please enter a name.');return;}
-  var role=prefix==='o'?(document.getElementById('o-role')?document.getElementById('o-role').value:'member'):'member';
-  var pin=genUniquePin();
-  members.push({name:name,role:role,status:'active',pin:pin,firstLogin:true});
-  var pg=document.getElementById(prefix+'-pin-generated');
-  if(pg){pg.style.display='';pg.innerHTML='PIN for <strong>'+name+'</strong>: <strong>'+pin+'</strong> — share this with them';}
-  if(nameEl)nameEl.value='';
-  renderAllLists();populateSuccessorSelect();populateVoteCandidates();
-}
+// ── Scan ───────────────────────────────────────────────────────────────────
+function selectMode(mode){currentMode=mode;document.getElementById('mode-badge').className='mode-badge '+mode;document.getElementById('mode-label').textContent=mode==='receive'?t('receive'):t('order');document.getElementById('price-field').style.display=mode==='order'?'':'none';document.getElementById('panel-btn').classList.remove('active');show('screen-camera');}
 
-function removeMember(i){
-  if(members[i].role==='owner'){alert('Cannot remove the Owner.');return;}
-  members.splice(i,1);
-  if(successor!==null){if(successor===i)successor=null;else if(successor>i)successor--;}
-  renderAllLists();populateSuccessorSelect();populateVoteCandidates();
-}
-
-function openEdit(i,isOwnerCtx){
-  editIdx=i;var m=members[i];
-  document.getElementById('e-name').value=m.name;document.getElementById('e-status').value=m.status;
-  var rw=document.getElementById('e-role-wrap');
-  if(isOwnerCtx&&m.role!=='owner'){rw.style.display='';document.getElementById('e-role').value=m.role;}
-  else rw.style.display='none';
-  document.getElementById('edit-modal').style.display='flex';
-}
-function saveEdit(){
-  if(editIdx===null)return;var m=members[editIdx];
-  m.name=document.getElementById('e-name').value.trim()||m.name;m.status=document.getElementById('e-status').value;
-  var rw=document.getElementById('e-role-wrap');if(rw.style.display!=='none')m.role=document.getElementById('e-role').value;
-  closeModal('edit-modal');editIdx=null;renderAllLists();populateSuccessorSelect();
-}
-
-// Scan
-function selectMode(mode){
-  currentMode=mode;document.getElementById('mode-badge').className='mode-badge '+mode;
-  document.getElementById('mode-label').textContent=mode==='receive'?'Receiving stock':'Ordering stock';
-  document.getElementById('price-field').style.display=mode==='order'?'':'none';
-  document.getElementById('panel-btn').classList.remove('active');show('screen-camera');
-}
 function startScan(){
   navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(stream){
     liveStream=stream;var v=document.getElementById('cam-video');v.srcObject=stream;v.style.display='';
-    document.getElementById('cam-ph').style.display='none';
-    document.getElementById('scan-overlay').style.display='';
-    document.getElementById('btn-row-start').style.display='none';
-    document.getElementById('btn-row-capture').style.display='';
-    document.getElementById('btn-row-retake').style.display='none';
-    scanning=true;
-    document.getElementById('scan-txt').textContent='Frame the box and tap Capture';
+    document.getElementById('cam-ph').style.display='none';document.getElementById('scan-overlay').style.display='';
+    document.getElementById('btn-row-start').style.display='none';document.getElementById('btn-row-capture').style.display='';document.getElementById('btn-row-retake').style.display='none';
+    scanning=true;document.getElementById('scan-txt').textContent=t('frameTheBox');
   }).catch(function(){alert('Camera not available — use Upload image instead.');});
 }
 
 function captureNow(){
-  if(!liveStream) return;
-  document.getElementById('scan-txt').textContent='Analyzing...';
+  if(!liveStream)return;
+  document.getElementById('scan-txt').textContent=t('analyzingBox');
   document.getElementById('btn-row-capture').style.display='none';
   var img=captureFrame();
-  runPipeline(img, true); // true = additive mode
+  // Show captured frame
+  var v=document.getElementById('cam-video');v.style.display='none';
+  var camBox=document.getElementById('camera-box');
+  var existing=camBox.querySelector('img.captured-frame');if(existing)existing.remove();
+  var imgEl=document.createElement('img');imgEl.className='captured-frame';
+  imgEl.src='data:image/jpeg;base64,'+img;
+  camBox.insertBefore(imgEl,camBox.querySelector('.scan-overlay'));
+  document.getElementById('scan-overlay').style.display='none';
+  // Stop live stream
+  if(liveStream){liveStream.getTracks().forEach(function(t){t.stop();});liveStream=null;}
+  runPipeline(img, true);
 }
 
 function retakeScan(){
-  // Go back to live camera, keep form data
   document.getElementById('btn-row-retake').style.display='none';
   document.getElementById('pipeline-sec').style.display='none';
-  if(liveStream){
-    document.getElementById('btn-row-capture').style.display='';
-    document.getElementById('scan-txt').textContent='Frame the box and tap Capture';
-  } else {
-    // Camera was stopped, restart it
-    startScan();
-  }
+  // Remove captured frame image
+  var camBox=document.getElementById('camera-box');
+  var existing=camBox.querySelector('img.captured-frame');if(existing)existing.remove();
+  startScan();
 }
 
 function stopScan(){
   scanning=false;
   if(liveStream){liveStream.getTracks().forEach(function(t){t.stop();});liveStream=null;}
   var v=document.getElementById('cam-video');if(v){v.style.display='none';v.srcObject=null;}
+  var camBox=document.getElementById('camera-box');var existing=camBox.querySelector('img.captured-frame');if(existing)existing.remove();
   var ph=document.getElementById('cam-ph');if(ph)ph.style.display='';
   var so=document.getElementById('scan-overlay');if(so)so.style.display='none';
-  document.getElementById('btn-row-start').style.display='';
-  document.getElementById('btn-row-capture').style.display='none';
-  document.getElementById('btn-row-retake').style.display='none';
+  document.getElementById('btn-row-start').style.display='';document.getElementById('btn-row-capture').style.display='none';document.getElementById('btn-row-retake').style.display='none';
 }
 
 function captureFrame(){var v=document.getElementById('cam-video'),c=document.getElementById('cam-canvas');c.width=v.videoWidth||640;c.height=v.videoHeight||480;c.getContext('2d').drawImage(v,0,0);return c.toDataURL('image/jpeg',.8).split(',')[1];}
 
-function captureAndAnalyze(){if(!scanning)return;document.getElementById('scan-txt').textContent='Analyzing...';runPipeline(captureFrame(), false);}
+function handleUpload(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){stopScan();var base64=ev.target.result.split(',')[1];var camBox=document.getElementById('camera-box');var existing=camBox.querySelector('img.captured-frame');if(existing)existing.remove();var imgEl=document.createElement('img');imgEl.className='captured-frame';imgEl.src=ev.target.result;camBox.insertBefore(imgEl,camBox.firstChild);document.getElementById('cam-ph').style.display='none';document.getElementById('btn-row-retake').style.display='';runPipeline(base64,false);};r.readAsDataURL(f);e.target.value='';}
 
-function handleUpload(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){stopScan();runPipeline(ev.target.result.split(',')[1], false);};r.readAsDataURL(f);e.target.value='';}
-
-function runPipeline(img, additive){
+// ── Pipeline ───────────────────────────────────────────────────────────────
+function runPipeline(img,additive){
   document.getElementById('pipeline-sec').style.display='';
-  if(!additive) document.getElementById('form-sec').style.display='none';
+  if(!additive)document.getElementById('form-sec').style.display='none';
   ['p1','p2','p3','p4'].forEach(function(id,i){var el=document.getElementById(id);if(!el)return;el.className='pipe-step';el.querySelector('.step-ic').innerHTML=i+1;});
   setStep('p1','active');
   aiAnalyze(img).then(function(aiData){
     setStep('p1','done');
-    var fd=additive?mergeWithExisting(aiData):Object.assign({},aiData);
-    lastSrc='ai';
+    var fd=additive?mergeWithExisting(aiData):Object.assign({},aiData);lastSrc='ai';
     var dbPromise=dbSheetId?(setStep('p2','active'),delay(800).then(function(){return checkDb(aiData.name||aiData.barcode);})):(setStep('p2','skipped'),Promise.resolve(null));
     dbPromise.then(function(dbData){
       if(dbData){fd=mergeData(fd,dbData);lastSrc='db';}if(dbSheetId)setStep('p2','done');
@@ -1123,75 +1314,45 @@ function runPipeline(img, additive){
       netPromise.then(function(netData){
         if(netData){fd=mergeData(fd,netData);if(netData.price)document.getElementById('f-price').value=netData.price;lastSrc=(lastSrc==='db')?'both':'internet';}
         if(missing>2)setStep('p3','done');
-        setStep('p4','active');delay(400).then(function(){
-          setStep('p4','done');fillForm(fd);
-          document.getElementById('form-sec').style.display='';
-          document.getElementById('btn-row-retake').style.display='';
-          // Stop camera after capture
-          if(liveStream){liveStream.getTracks().forEach(function(t){t.stop();});liveStream=null;}
-          var v=document.getElementById('cam-video');if(v){v.style.display='none';v.srcObject=null;}
-          document.getElementById('scan-overlay').style.display='none';
-          document.getElementById('cam-ph').style.display='';
-        });
+        setStep('p4','active');delay(400).then(function(){setStep('p4','done');fillForm(fd);document.getElementById('form-sec').style.display='';document.getElementById('btn-row-retake').style.display='';});
       });
     });
   });
 }
 
-function mergeWithExisting(newData){
-  var existing={
-    name:document.getElementById('f-name').value,
-    brand:document.getElementById('f-brand').value,
-    barcode:document.getElementById('f-barcode').value,
-    lot:document.getElementById('f-lot').value,
-    expiry:document.getElementById('f-expiry').value,
-    quantity:document.getElementById('f-qty').value,
-    unit:document.getElementById('f-unit').value,
-    supplier:document.getElementById('f-supplier').value,
-    notes:document.getElementById('f-notes').value
-  };
-  var merged={};
-  Object.keys(existing).forEach(function(k){merged[k]=existing[k]||newData[k]||'';});
-  return merged;
-}
+function mergeWithExisting(newData){var existing={name:document.getElementById('f-name').value,brand:document.getElementById('f-brand').value,barcode:document.getElementById('f-barcode').value,lot:document.getElementById('f-lot').value,expiry:document.getElementById('f-expiry').value,quantity:document.getElementById('f-qty').value,unit:document.getElementById('f-unit').value,supplier:document.getElementById('f-supplier').value,notes:document.getElementById('f-notes').value};var merged={};Object.keys(existing).forEach(function(k){merged[k]=existing[k]||newData[k]||'';});return merged;}
 function setStep(id,state){var el=document.getElementById(id);if(!el)return;el.className='pipe-step '+state;var ic=el.querySelector('.step-ic');if(state==='active')ic.innerHTML='<div class="mini-spin"></div>';else if(state==='done')ic.innerHTML='✓';else ic.innerHTML=['p1','p2','p3','p4'].indexOf(id)+1;}
-function aiAnalyze(img){return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},{type:'text',text:'Analyze this lab/pharmacy product box. Return ONLY a JSON object with no markdown: name, brand, barcode, lot, expiry (YYYY-MM), quantity, unit, supplier, notes. Use empty string for missing fields.'}]}]})}).then(function(r){return r.json();}).then(function(d){var t=d.content.map(function(i){return i.text||'';}).join('');return JSON.parse(t.replace(/```json|```/g,'').trim());}).catch(function(){return{};});}
+
+function aiAnalyze(img){return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},{type:'text',text:'Analyze this lab/pharmacy product box. Return ONLY a JSON object with no markdown: name, brand, barcode, lot, expiry (YYYY-MM), quantity, unit, supplier, notes. Use empty string for missing fields.'}]}]})}).then(function(r){return r.json();}).then(function(d){var tx=d.content.map(function(i){return i.text||'';}).join('');return JSON.parse(tx.replace(/```json|```/g,'').trim());}).catch(function(){return{};});}
 function checkDb(q){if(!q||!dbSheetId||!googleApiKey)return Promise.resolve(null);return delay(600).then(function(){return null;});}
-function netSearch(q,includePrice){if(!q)return Promise.resolve(null);var extra=includePrice?' Also find the current market price and include it as "price" (e.g. "$24.99").':'';return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:'For lab/pharmacy product "'+q+'", return ONLY a JSON object: supplier, brand, unit, notes'+(includePrice?', price':'')+'. Empty string for unknown.'+extra}]})}).then(function(r){return r.json();}).then(function(d){var t=d.content.filter(function(i){return i.type==='text';}).map(function(i){return i.text;}).join('');if(!t)return null;return JSON.parse(t.replace(/```json|```/g,'').trim());}).catch(function(){return null;});}
+function netSearch(q,includePrice){if(!q)return Promise.resolve(null);var extra=includePrice?' Also find the current market price and include it as "price" (e.g. "$24.99").':'';return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:'For lab/pharmacy product "'+q+'", return ONLY a JSON object: supplier, brand, unit, notes'+(includePrice?', price':'')+'. Empty string for unknown.'+extra}]})}).then(function(r){return r.json();}).then(function(d){var tx=d.content.filter(function(i){return i.type==='text';}).map(function(i){return i.text;}).join('');if(!tx)return null;return JSON.parse(tx.replace(/```json|```/g,'').trim());}).catch(function(){return null;});}
 function mergeData(b,o){var m=Object.assign({},b);Object.keys(o).forEach(function(k){if(!m[k]&&o[k])m[k]=o[k];});return m;}
 
+// ── Form ───────────────────────────────────────────────────────────────────
 function fillForm(d){document.getElementById('f-name').value=d.name||'';document.getElementById('f-brand').value=d.brand||'';document.getElementById('f-barcode').value=d.barcode||'';document.getElementById('f-lot').value=d.lot||'';document.getElementById('f-expiry').value=d.expiry||'';document.getElementById('f-qty').value=d.quantity||'';document.getElementById('f-unit').value=d.unit||'';document.getElementById('f-supplier').value=d.supplier||'';document.getElementById('f-notes').value=d.notes||'';document.getElementById('tog-chem').checked=false;}
 function clearForm(){fillForm({});document.getElementById('f-loc').value='';document.getElementById('f-price').value='';document.getElementById('tog-chem').checked=false;}
 
 function confirmEntry(){
   var entry={type:currentMode,name:document.getElementById('f-name').value,brand:document.getElementById('f-brand').value,barcode:document.getElementById('f-barcode').value,lot:document.getElementById('f-lot').value,expiry:document.getElementById('f-expiry').value,quantity:document.getElementById('f-qty').value,unit:document.getElementById('f-unit').value,supplier:document.getElementById('f-supplier').value,price:currentMode==='order'?document.getElementById('f-price').value:'',location:document.getElementById('f-loc').value,notes:document.getElementById('f-notes').value,chemical:document.getElementById('tog-chem').checked?'Yes':'No',scannedBy:currentUser?currentUser.name:'',dateAdded:new Date().toISOString().split('T')[0],source:lastSrc};
   entries.push(entry);
-  // Write to Google Sheets
-  var sheetStatus=document.getElementById('sheet-write-status');
-  if(googleApiKey&&sheetId){
-    if(sheetStatus)sheetStatus.textContent='Saving to sheet...';
-    writeEntryToSheet(entry).then(function(ok){
-      if(sheetStatus)sheetStatus.textContent=ok?'Saved to Google Sheet.':'Could not reach sheet — entry saved locally.';
-    });
-  }
+  var ss=document.getElementById('sheet-write-status');
+  if(googleApiKey&&sheetId){if(ss)ss.textContent=t('savingToSheet');writeEntryToSheet(entry).then(function(ok){if(ss)ss.textContent=ok?t('savedToSheet'):t('sheetError');});}
   document.getElementById('sicon').className='sicon '+currentMode;
-  document.getElementById('s-title').textContent=currentMode==='receive'?'Product received!':'Order recorded!';
-  var labels={ai:'Identified by AI',db:'Matched from database',internet:'Completed via internet',both:'Database + internet'};
+  document.getElementById('s-title').textContent=currentMode==='receive'?t('productReceived'):t('orderRecorded');
+  var labels={ai:t('identifiedByAI'),db:t('matchedFromDb'),internet:t('completedViaInternet'),both:t('dbPlusInternet')};
   var colors={ai:'ai',db:'db',internet:'ai',both:'both'};
   document.getElementById('s-tag').innerHTML='<span class="src-tag '+colors[lastSrc]+'">'+labels[lastSrc]+'</span>';
   document.getElementById('s-sub').textContent=(entry.name||'Product')+' has been saved.';
   document.getElementById('open-sheet-btn').style.display=(googleApiKey&&sheetId)?'':'none';
   show('screen-success');
 }
-function scanAnother(){clearForm();document.getElementById('pipeline-sec').style.display='none';document.getElementById('form-sec').style.display='none';show('screen-camera');}
+
+function scanAnother(){clearForm();document.getElementById('pipeline-sec').style.display='none';document.getElementById('form-sec').style.display='none';var camBox=document.getElementById('camera-box');var existing=camBox.querySelector('img.captured-frame');if(existing)existing.remove();document.getElementById('cam-ph').style.display='';document.getElementById('btn-row-start').style.display='';document.getElementById('btn-row-capture').style.display='none';document.getElementById('btn-row-retake').style.display='none';show('screen-camera');}
+
 function exportExcel(){
   if(!entries.length){alert('No items to export yet.');return;}
   var h=['Type','Product name','Brand','Barcode','Lot','Expiry','Quantity','Unit','Supplier','Price','Location','Chemical','Scanned by','Date received','Date ordered','Source'];
-  var rows=entries.map(function(i){return[
-    i.type==='receive'?'Received':'Order',i.name,i.brand,i.barcode,i.lot,i.expiry,
-    i.quantity,i.unit,i.supplier,i.type==='order'?i.price:'',i.location,i.chemical,
-    i.scannedBy,i.type==='receive'?i.dateAdded:'',i.type==='order'?i.dateAdded:'',i.source
-  ];});
+  var rows=entries.map(function(i){return[i.type==='receive'?'Received':'Order',i.name,i.brand,i.barcode,i.lot,i.expiry,i.quantity,i.unit,i.supplier,i.type==='order'?i.price:'',i.location,i.chemical,i.scannedBy,i.type==='receive'?i.dateAdded:'',i.type==='order'?i.dateAdded:'',i.source];});
   var ws=XLSX.utils.aoa_to_sheet([h].concat(rows));ws['!cols']=h.map(function(){return{wch:16};});
   var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'ReOrder');
   XLSX.writeFile(wb,'reorder-'+new Date().toISOString().split('T')[0]+'.xlsx');
