@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ReOrder</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#185FA5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ReOrder">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 /* ── Color schemes ─────────────────────────────────────────────────────── */
 :root {
@@ -1356,6 +1362,13 @@ function exportExcel(){
   var ws=XLSX.utils.aoa_to_sheet([h].concat(rows));ws['!cols']=h.map(function(){return{wch:16};});
   var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'ReOrder');
   XLSX.writeFile(wb,'reorder-'+new Date().toISOString().split('T')[0]+'.xlsx');
+}
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(e){ console.log('SW error:', e); });
+  });
 }
 </script>
 </body>

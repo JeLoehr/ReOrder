@@ -1,0 +1,22 @@
+{
+  "name": "ReOrder",
+  "short_name": "ReOrder",
+  "description": "A fast and simple inventory tool for research centres. Scan product boxes to receive stock or place orders, all saved automatically to your team's shared spreadsheet.",
+  "start_url": "/reorder/",
+  "display": "standalone",
+  "background_color": "#f1efe8",
+  "theme_color": "#185FA5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
