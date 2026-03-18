@@ -323,32 +323,28 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
     </div>
 
     <div class="panel">
-      <div class="panel-hdr">Inventory spreadsheet</div>
+      <div class="panel-hdr">Google Sheets setup</div>
       <div class="panel-row">
-        <div class="row-lbl">Master Excel file</div>
-        <div class="row-sub">Where all scans are exported — stored on OneDrive</div>
-        <div class="hint">In OneDrive: open file → Share → Anyone with the link can edit → Copy link</div>
-        <input class="pinput" type="url" id="inp-excel" placeholder="https://onedrive.live.com/...">
-        <div class="btn-row" style="margin-top:0;">
-          <button class="btn amber" onclick="saveLink('excel')" style="font-size:13px;padding:8px;">Save</button>
-          <button class="btn" id="btn-open-excel" onclick="openLink('excel')" style="font-size:13px;padding:8px;display:none;">Open file</button>
-        </div>
-        <div class="save-msg" id="msg-excel">Saved.</div>
+        <div class="row-lbl">Google API key</div>
+        <div class="row-sub">From Google Cloud Console — used to write scan data to your sheet</div>
+        <input class="pinput" type="text" id="inp-apikey" placeholder="AIzaSy...">
+        <div class="save-msg" id="msg-apikey"></div>
       </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-hdr">Product database</div>
       <div class="panel-row">
-        <div class="row-lbl">Database spreadsheet</div>
-        <div class="row-sub">Known products list — checked before AI or internet search</div>
-        <div class="hint">In OneDrive: open file → Share → Anyone with the link can edit → Copy link</div>
-        <input class="pinput" type="url" id="inp-db" placeholder="https://onedrive.live.com/...">
-        <div class="btn-row" style="margin-top:0;">
-          <button class="btn amber" onclick="saveLink('db')" style="font-size:13px;padding:8px;">Save</button>
-          <button class="btn" id="btn-open-db" onclick="openLink('db')" style="font-size:13px;padding:8px;display:none;">Open file</button>
-        </div>
-        <div class="save-msg" id="msg-db">Saved.</div>
+        <div class="row-lbl">Inventory sheet ID</div>
+        <div class="row-sub">The long ID from your Google Sheet URL</div>
+        <div class="hint">From your sheet URL: docs.google.com/spreadsheets/d/<strong>SHEET-ID</strong>/edit</div>
+        <input class="pinput" type="text" id="inp-sheetid" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqp...">
+        <div class="save-msg" id="msg-sheetid"></div>
+      </div>
+      <div class="panel-row">
+        <div class="row-lbl">Product database sheet ID</div>
+        <div class="row-sub">Optional — known products list checked before AI or internet search</div>
+        <input class="pinput" type="text" id="inp-dbsheetid" placeholder="Sheet ID (optional)">
+        <div class="save-msg" id="msg-dbsheetid"></div>
+      </div>
+      <div class="panel-row" style="padding-top:8px;">
+        <button class="btn amber" onclick="saveGoogleConfig()" style="width:100%;font-size:13px;padding:8px;">Save configuration</button>
       </div>
     </div>
 
@@ -356,7 +352,12 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
       <div class="panel-hdr">Connection status</div>
       <div class="status-row">
         <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div class="status-lbl">Inventory spreadsheet</div>
+        <div class="status-lbl">Google API key</div>
+        <div class="status-val notset" id="st-apikey">Not set</div>
+      </div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl">Inventory sheet</div>
         <div class="status-val notset" id="st-excel">Not set</div>
       </div>
       <div class="status-row">
@@ -431,7 +432,12 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
       <div class="panel-hdr">Linked files</div>
       <div class="status-row">
         <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div class="status-lbl">Inventory spreadsheet</div>
+        <div class="status-lbl">Google API key</div>
+        <div class="status-val notset" id="ast-apikey">Not set</div>
+      </div>
+      <div class="status-row">
+        <svg class="lock-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="status-lbl">Inventory sheet</div>
         <div class="status-val notset" id="ast-excel">Not set</div>
       </div>
       <div class="status-row">
@@ -515,16 +521,22 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
         <canvas id="cam-canvas" style="display:none;"></canvas>
         <div class="scan-overlay" id="scan-overlay" style="display:none;">
           <div class="scan-frame"></div><div class="scan-line"></div>
-          <div class="scan-status"><span id="scan-txt">Scanning...</span></div>
+          <div class="scan-status"><span id="scan-txt">Frame the box and tap Capture</span></div>
         </div>
       </div>
       <input type="file" id="fileInput" accept="image/*" onchange="handleUpload(event)">
       <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleUpload(event)">
-      <div class="btn-row">
+      <div class="btn-row" id="btn-row-start">
         <button class="btn primary" id="live-btn" onclick="startScan()">Start live scan</button>
         <button class="btn" onclick="document.getElementById('fileInput').click()">Upload image</button>
       </div>
-      <button class="btn" id="stop-btn" onclick="stopScan()" style="display:none;margin-top:8px;">Stop scanning</button>
+      <div class="btn-row" id="btn-row-capture" style="display:none;margin-top:8px;">
+        <button class="btn primary" onclick="captureNow()">Capture</button>
+        <button class="btn" onclick="stopScan()">Cancel</button>
+      </div>
+      <div class="btn-row" id="btn-row-retake" style="display:none;margin-top:8px;">
+        <button class="btn" onclick="retakeScan()">Retake</button>
+      </div>
     </div>
     <div class="section" id="pipeline-sec" style="display:none;">
       <div class="sec-lbl">Lookup pipeline</div>
@@ -567,10 +579,11 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
       <div class="sicon" id="sicon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
       <div style="font-size:17px;font-weight:500;color:#1a1a18;margin-bottom:6px;" id="s-title"></div>
       <div id="s-tag"></div>
-      <div style="font-size:13px;color:#888780;margin-bottom:1.5rem;" id="s-sub"></div>
+      <div style="font-size:13px;color:#888780;margin-bottom:6px;" id="s-sub"></div>
+      <div style="font-size:12px;color:#0F6E56;margin-bottom:1.5rem;min-height:18px;" id="sheet-write-status"></div>
       <div class="success-actions">
-        <button class="btn" id="exp-btn" onclick="exportExcel()"></button>
-        <button class="btn" id="open-sheet-btn" style="display:none;" onclick="openLink('excel')">Open shared spreadsheet</button>
+        <button class="btn" id="open-sheet-btn" style="display:none;" onclick="openLink('excel')">Open Google Sheet</button>
+        <button class="btn" onclick="exportExcel()">Export to Excel (.xlsx)</button>
         <button class="btn" onclick="scanAnother()">Scan another product</button>
         <button class="btn" onclick="goHome()">Back to home</button>
       </div>
@@ -635,7 +648,8 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #f1efe8; m
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 var entries=[], currentMode=null, currentUser=null;
-var excelLink='', dbLink='', lastSrc='ai';
+var googleApiKey='', sheetId='', dbSheetId='', lastSrc='ai';
+var sheetHeaderFingerprint=null, columnMap=null;
 var successor=null, activeVote=null;
 var liveStream=null, scanInt=null, scanning=false;
 var editIdx=null, pinBuffer='', confirmBuffer='';
@@ -645,6 +659,13 @@ var members=[
   {name:'Lab Owner', role:'owner', status:'active', pin:'1234', firstLogin:false},
   {name:'Lab Admin', role:'admin', status:'active', pin:'5678', firstLogin:false},
   {name:'Marie Tremblay', role:'member', status:'active', pin:'9012', firstLogin:true}
+];
+
+// Sample entries for testing
+var entries=[
+  {type:'receive',name:'Acetaminophen 500mg',brand:'Tylenol',barcode:'0300450455',lot:'LOT2024A',expiry:'2026-08',quantity:'100',unit:'tablets',supplier:'McKesson',price:'',location:'Room 3B Shelf 2',notes:'',chemical:'No',scannedBy:'Lab Admin',dateAdded:'2025-03-01',source:'ai'},
+  {type:'order',name:'Ethanol 95%',brand:'Fisher Scientific',barcode:'E7023',lot:'LOT2024B',expiry:'2027-01',quantity:'4',unit:'L',supplier:'Fisher Scientific',price:'$42.50',location:'Chemical Storage',notes:'Flammable',chemical:'Yes',scannedBy:'Lab Owner',dateAdded:'2025-03-05',source:'db'},
+  {type:'receive',name:'Phosphate Buffered Saline',brand:'Sigma-Aldrich',barcode:'P4417',lot:'LOT2024C',expiry:'2026-12',quantity:'10',unit:'packets',supplier:'Sigma-Aldrich',price:'',location:'Room 3B Shelf 1',notes:'',chemical:'Yes',scannedBy:'Marie Tremblay',dateAdded:'2025-03-10',source:'internet'}
 ];
 
 function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
@@ -740,17 +761,121 @@ function togglePanel(){
 }
 
 // Links
-function saveLink(type){
-  if(type==='excel'){excelLink=document.getElementById('inp-excel').value.trim();document.getElementById('btn-open-excel').style.display=excelLink?'':'none';flashMsg('msg-excel');}
-  else{dbLink=document.getElementById('inp-db').value.trim();document.getElementById('btn-open-db').style.display=dbLink?'':'none';flashMsg('msg-db');}
+// Google Sheets config
+function saveGoogleConfig(){
+  googleApiKey=document.getElementById('inp-apikey').value.trim();
+  sheetId=document.getElementById('inp-sheetid').value.trim();
+  dbSheetId=document.getElementById('inp-dbsheetid').value.trim();
+  sheetHeaderFingerprint=null; columnMap=null; // reset on config change
   updateStatus();
+  var msg=document.getElementById('msg-apikey');
+  if(msg){msg.textContent='Configuration saved.';flashMsg('msg-apikey');}
 }
-function openLink(type){var l=type==='excel'?excelLink:dbLink;if(l)window.open(l,'_blank');}
+
+function openLink(type){
+  var id=type==='excel'?sheetId:dbSheetId;
+  if(id)window.open('https://docs.google.com/spreadsheets/d/'+id+'/edit','_blank');
+}
+
 function updateStatus(){
-  var ev=excelLink?'Linked':'Not set',ec=excelLink?'linked':'notset';
-  var dv=dbLink?'Linked':'Not set',dc=dbLink?'linked':'notset';
+  var ak=googleApiKey?'Linked':'Not set', akc=googleApiKey?'linked':'notset';
+  var ev=sheetId?'Linked':'Not set', ec=sheetId?'linked':'notset';
+  var dv=dbSheetId?'Linked':'Not set', dc=dbSheetId?'linked':'notset';
+  ['st-apikey','ast-apikey'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.textContent=ak;el.className='status-val '+akc;});
   ['st-excel','ast-excel'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.textContent=ev;el.className='status-val '+ec;});
   ['st-db','ast-db'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.textContent=dv;el.className='status-val '+dc;});
+}
+
+// Google Sheets write
+var SHEET_HEADERS=['Type','Product name','Brand','Barcode','Lot','Expiry','Quantity','Unit','Supplier','Price','Location','Chemical','Scanned by','Date received','Date ordered','Source'];
+
+async function getSheetHeaders(){
+  if(!googleApiKey||!sheetId) return null;
+  try{
+    var url='https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/Sheet1!1:1?key='+googleApiKey;
+    var r=await fetch(url);var d=await r.json();
+    return (d.values&&d.values[0])?d.values[0]:[];
+  }catch(e){return null;}
+}
+
+async function ensureHeaders(){
+  var existing=await getSheetHeaders();
+  if(!existing) return false;
+  // If sheet is empty, write headers
+  if(existing.length===0){
+    await writeRow(SHEET_HEADERS, true);
+    columnMap=buildColumnMap(SHEET_HEADERS);
+    sheetHeaderFingerprint=SHEET_HEADERS.join('|');
+    return true;
+  }
+  var fingerprint=existing.join('|');
+  // If headers changed, re-map using AI
+  if(fingerprint!==sheetHeaderFingerprint){
+    columnMap=await aiMapColumns(existing);
+    sheetHeaderFingerprint=fingerprint;
+    // Add any missing headers
+    var missing=SHEET_HEADERS.filter(function(h){return existing.indexOf(h)===-1;});
+    if(missing.length>0){
+      var newHeaders=existing.concat(missing);
+      var range='Sheet1!'+colLetter(existing.length+1)+'1:'+colLetter(newHeaders.length)+'1';
+      await appendCells(range,[missing]);
+      sheetHeaderFingerprint=newHeaders.join('|');
+      columnMap=buildColumnMap(newHeaders);
+    }
+  }
+  return true;
+}
+
+function buildColumnMap(headers){
+  var map={};headers.forEach(function(h,i){map[h]=i;});return map;
+}
+
+async function aiMapColumns(headers){
+  // Use AI to map existing headers to known fields
+  try{
+    var prompt='Given these spreadsheet column headers: '+JSON.stringify(headers)+'. Map each to one of these standard fields: '+JSON.stringify(SHEET_HEADERS)+'. Return ONLY a JSON object where keys are standard field names and values are the index (0-based) of the matching header. If no match exists use -1.';
+    var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
+    var d=await r.json();var t=d.content.map(function(i){return i.text||'';}).join('');
+    return JSON.parse(t.replace(/```json|```/g,'').trim());
+  }catch(e){return buildColumnMap(headers);}
+}
+
+function colLetter(n){
+  var s='';while(n>0){var r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;
+}
+
+async function writeRow(values, isHeader){
+  if(!googleApiKey||!sheetId) return false;
+  try{
+    var url='https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS&key='+googleApiKey;
+    await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:[values]})});
+    return true;
+  }catch(e){return false;}
+}
+
+async function appendCells(range, values){
+  if(!googleApiKey||!sheetId) return;
+  var url='https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/'+range+'?valueInputOption=USER_ENTERED&key='+googleApiKey;
+  await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:values})});
+}
+
+async function writeEntryToSheet(entry){
+  if(!googleApiKey||!sheetId){return false;}
+  var ok=await ensureHeaders();if(!ok)return false;
+  var today=entry.dateAdded;
+  var row=new Array(Object.keys(columnMap).length).fill('');
+  function set(field,val){var idx=columnMap[field];if(idx!==undefined&&idx>=0)row[idx]=val||'';}
+  set('Type',entry.type==='receive'?'Received':'Order');
+  set('Product name',entry.name);set('Brand',entry.brand);set('Barcode',entry.barcode);
+  set('Lot',entry.lot);set('Expiry',entry.expiry);set('Quantity',entry.quantity);
+  set('Unit',entry.unit);set('Supplier',entry.supplier);
+  set('Price',entry.type==='order'?entry.price:'');
+  set('Location',entry.location);set('Chemical',entry.chemical);
+  set('Scanned by',entry.scannedBy);
+  set('Date received',entry.type==='receive'?today:'');
+  set('Date ordered',entry.type==='order'?today:'');
+  set('Source',entry.source);
+  return await writeRow(row, false);
 }
 
 // Successor
@@ -933,47 +1058,105 @@ function selectMode(mode){
 function startScan(){
   navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(stream){
     liveStream=stream;var v=document.getElementById('cam-video');v.srcObject=stream;v.style.display='';
-    document.getElementById('cam-ph').style.display='none';document.getElementById('scan-overlay').style.display='';
-    document.getElementById('live-btn').style.display='none';document.getElementById('stop-btn').style.display='';
-    scanning=true;document.getElementById('scan-txt').textContent='Scanning — hold steady...';
-    scanInt=setInterval(captureAndAnalyze,4000);setTimeout(captureAndAnalyze,1500);
+    document.getElementById('cam-ph').style.display='none';
+    document.getElementById('scan-overlay').style.display='';
+    document.getElementById('btn-row-start').style.display='none';
+    document.getElementById('btn-row-capture').style.display='';
+    document.getElementById('btn-row-retake').style.display='none';
+    scanning=true;
+    document.getElementById('scan-txt').textContent='Frame the box and tap Capture';
   }).catch(function(){alert('Camera not available — use Upload image instead.');});
 }
+
+function captureNow(){
+  if(!liveStream) return;
+  document.getElementById('scan-txt').textContent='Analyzing...';
+  document.getElementById('btn-row-capture').style.display='none';
+  var img=captureFrame();
+  runPipeline(img, true); // true = additive mode
+}
+
+function retakeScan(){
+  // Go back to live camera, keep form data
+  document.getElementById('btn-row-retake').style.display='none';
+  document.getElementById('pipeline-sec').style.display='none';
+  if(liveStream){
+    document.getElementById('btn-row-capture').style.display='';
+    document.getElementById('scan-txt').textContent='Frame the box and tap Capture';
+  } else {
+    // Camera was stopped, restart it
+    startScan();
+  }
+}
+
 function stopScan(){
-  scanning=false;if(scanInt){clearInterval(scanInt);scanInt=null;}
+  scanning=false;
   if(liveStream){liveStream.getTracks().forEach(function(t){t.stop();});liveStream=null;}
   var v=document.getElementById('cam-video');if(v){v.style.display='none';v.srcObject=null;}
   var ph=document.getElementById('cam-ph');if(ph)ph.style.display='';
   var so=document.getElementById('scan-overlay');if(so)so.style.display='none';
-  var lb=document.getElementById('live-btn');if(lb)lb.style.display='';
-  var sb=document.getElementById('stop-btn');if(sb)sb.style.display='none';
+  document.getElementById('btn-row-start').style.display='';
+  document.getElementById('btn-row-capture').style.display='none';
+  document.getElementById('btn-row-retake').style.display='none';
 }
-function captureFrame(){var v=document.getElementById('cam-video'),c=document.getElementById('cam-canvas');c.width=v.videoWidth||640;c.height=v.videoHeight||480;c.getContext('2d').drawImage(v,0,0);return c.toDataURL('image/jpeg',.8).split(',')[1];}
-function captureAndAnalyze(){if(!scanning)return;document.getElementById('scan-txt').textContent='Analyzing...';runPipeline(captureFrame());}
-function handleUpload(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){stopScan();runPipeline(ev.target.result.split(',')[1]);};r.readAsDataURL(f);e.target.value='';}
 
-function runPipeline(img){
-  document.getElementById('pipeline-sec').style.display='';document.getElementById('form-sec').style.display='none';
+function captureFrame(){var v=document.getElementById('cam-video'),c=document.getElementById('cam-canvas');c.width=v.videoWidth||640;c.height=v.videoHeight||480;c.getContext('2d').drawImage(v,0,0);return c.toDataURL('image/jpeg',.8).split(',')[1];}
+
+function captureAndAnalyze(){if(!scanning)return;document.getElementById('scan-txt').textContent='Analyzing...';runPipeline(captureFrame(), false);}
+
+function handleUpload(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){stopScan();runPipeline(ev.target.result.split(',')[1], false);};r.readAsDataURL(f);e.target.value='';}
+
+function runPipeline(img, additive){
+  document.getElementById('pipeline-sec').style.display='';
+  if(!additive) document.getElementById('form-sec').style.display='none';
   ['p1','p2','p3','p4'].forEach(function(id,i){var el=document.getElementById(id);if(!el)return;el.className='pipe-step';el.querySelector('.step-ic').innerHTML=i+1;});
   setStep('p1','active');
   aiAnalyze(img).then(function(aiData){
-    setStep('p1','done');var fd=Object.assign({},aiData);lastSrc='ai';
-    var dbPromise=dbLink?(setStep('p2','active'),delay(800).then(function(){return checkDb(aiData.name||aiData.barcode);})):(setStep('p2','skipped'),Promise.resolve(null));
+    setStep('p1','done');
+    var fd=additive?mergeWithExisting(aiData):Object.assign({},aiData);
+    lastSrc='ai';
+    var dbPromise=dbSheetId?(setStep('p2','active'),delay(800).then(function(){return checkDb(aiData.name||aiData.barcode);})):(setStep('p2','skipped'),Promise.resolve(null));
     dbPromise.then(function(dbData){
-      if(dbData){fd=mergeData(fd,dbData);lastSrc='db';}if(dbLink)setStep('p2','done');
+      if(dbData){fd=mergeData(fd,dbData);lastSrc='db';}if(dbSheetId)setStep('p2','done');
       var missing=Object.values(fd).filter(function(v){return !v;}).length;
       var netPromise=missing>2?(setStep('p3','active'),netSearch(aiData.name||aiData.barcode,currentMode==='order')):(setStep('p3','skipped'),Promise.resolve(null));
       netPromise.then(function(netData){
         if(netData){fd=mergeData(fd,netData);if(netData.price)document.getElementById('f-price').value=netData.price;lastSrc=(lastSrc==='db')?'both':'internet';}
         if(missing>2)setStep('p3','done');
-        setStep('p4','active');delay(400).then(function(){setStep('p4','done');fillForm(fd);document.getElementById('form-sec').style.display='';if(scanning)stopScan();});
+        setStep('p4','active');delay(400).then(function(){
+          setStep('p4','done');fillForm(fd);
+          document.getElementById('form-sec').style.display='';
+          document.getElementById('btn-row-retake').style.display='';
+          // Stop camera after capture
+          if(liveStream){liveStream.getTracks().forEach(function(t){t.stop();});liveStream=null;}
+          var v=document.getElementById('cam-video');if(v){v.style.display='none';v.srcObject=null;}
+          document.getElementById('scan-overlay').style.display='none';
+          document.getElementById('cam-ph').style.display='';
+        });
       });
     });
   });
 }
+
+function mergeWithExisting(newData){
+  var existing={
+    name:document.getElementById('f-name').value,
+    brand:document.getElementById('f-brand').value,
+    barcode:document.getElementById('f-barcode').value,
+    lot:document.getElementById('f-lot').value,
+    expiry:document.getElementById('f-expiry').value,
+    quantity:document.getElementById('f-qty').value,
+    unit:document.getElementById('f-unit').value,
+    supplier:document.getElementById('f-supplier').value,
+    notes:document.getElementById('f-notes').value
+  };
+  var merged={};
+  Object.keys(existing).forEach(function(k){merged[k]=existing[k]||newData[k]||'';});
+  return merged;
+}
 function setStep(id,state){var el=document.getElementById(id);if(!el)return;el.className='pipe-step '+state;var ic=el.querySelector('.step-ic');if(state==='active')ic.innerHTML='<div class="mini-spin"></div>';else if(state==='done')ic.innerHTML='✓';else ic.innerHTML=['p1','p2','p3','p4'].indexOf(id)+1;}
 function aiAnalyze(img){return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},{type:'text',text:'Analyze this lab/pharmacy product box. Return ONLY a JSON object with no markdown: name, brand, barcode, lot, expiry (YYYY-MM), quantity, unit, supplier, notes. Use empty string for missing fields.'}]}]})}).then(function(r){return r.json();}).then(function(d){var t=d.content.map(function(i){return i.text||'';}).join('');return JSON.parse(t.replace(/```json|```/g,'').trim());}).catch(function(){return{};});}
-function checkDb(q){if(!q||!dbLink)return Promise.resolve(null);return delay(600).then(function(){return null;});}
+function checkDb(q){if(!q||!dbSheetId||!googleApiKey)return Promise.resolve(null);return delay(600).then(function(){return null;});}
 function netSearch(q,includePrice){if(!q)return Promise.resolve(null);var extra=includePrice?' Also find the current market price and include it as "price" (e.g. "$24.99").':'';return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:'For lab/pharmacy product "'+q+'", return ONLY a JSON object: supplier, brand, unit, notes'+(includePrice?', price':'')+'. Empty string for unknown.'+extra}]})}).then(function(r){return r.json();}).then(function(d){var t=d.content.filter(function(i){return i.type==='text';}).map(function(i){return i.text;}).join('');if(!t)return null;return JSON.parse(t.replace(/```json|```/g,'').trim());}).catch(function(){return null;});}
 function mergeData(b,o){var m=Object.assign({},b);Object.keys(o).forEach(function(k){if(!m[k]&&o[k])m[k]=o[k];});return m;}
 
@@ -983,23 +1166,35 @@ function clearForm(){fillForm({});document.getElementById('f-loc').value='';docu
 function confirmEntry(){
   var entry={type:currentMode,name:document.getElementById('f-name').value,brand:document.getElementById('f-brand').value,barcode:document.getElementById('f-barcode').value,lot:document.getElementById('f-lot').value,expiry:document.getElementById('f-expiry').value,quantity:document.getElementById('f-qty').value,unit:document.getElementById('f-unit').value,supplier:document.getElementById('f-supplier').value,price:currentMode==='order'?document.getElementById('f-price').value:'',location:document.getElementById('f-loc').value,notes:document.getElementById('f-notes').value,chemical:document.getElementById('tog-chem').checked?'Yes':'No',scannedBy:currentUser?currentUser.name:'',dateAdded:new Date().toISOString().split('T')[0],source:lastSrc};
   entries.push(entry);
+  // Write to Google Sheets
+  var sheetStatus=document.getElementById('sheet-write-status');
+  if(googleApiKey&&sheetId){
+    if(sheetStatus)sheetStatus.textContent='Saving to sheet...';
+    writeEntryToSheet(entry).then(function(ok){
+      if(sheetStatus)sheetStatus.textContent=ok?'Saved to Google Sheet.':'Could not reach sheet — entry saved locally.';
+    });
+  }
   document.getElementById('sicon').className='sicon '+currentMode;
   document.getElementById('s-title').textContent=currentMode==='receive'?'Product received!':'Order recorded!';
   var labels={ai:'Identified by AI',db:'Matched from database',internet:'Completed via internet',both:'Database + internet'};
   var colors={ai:'ai',db:'db',internet:'ai',both:'both'};
   document.getElementById('s-tag').innerHTML='<span class="src-tag '+colors[lastSrc]+'">'+labels[lastSrc]+'</span>';
   document.getElementById('s-sub').textContent=(entry.name||'Product')+' has been saved.';
-  var eb=document.getElementById('exp-btn');eb.textContent=currentMode==='receive'?'Export received items (.xlsx)':'Export order list (.xlsx)';eb.className='btn '+(currentMode==='receive'?'green':'blue');
-  document.getElementById('open-sheet-btn').style.display=excelLink?'':'none';show('screen-success');
+  document.getElementById('open-sheet-btn').style.display=(googleApiKey&&sheetId)?'':'none';
+  show('screen-success');
 }
 function scanAnother(){clearForm();document.getElementById('pipeline-sec').style.display='none';document.getElementById('form-sec').style.display='none';show('screen-camera');}
 function exportExcel(){
-  var f=entries.filter(function(e){return e.type===currentMode;});if(!f.length){alert('No items to export yet.');return;}
-  var h=currentMode==='order'?['Type','Product name','Brand','Barcode','Lot','Expiry','Quantity','Unit','Supplier','Price','Location','Chemical','Scanned by','Date','Source']:['Type','Product name','Brand','Barcode','Lot','Expiry','Quantity','Unit','Supplier','Location','Chemical','Scanned by','Date','Source'];
-  var rows=f.map(function(i){var b=[i.type==='receive'?'Received':'Order',i.name,i.brand,i.barcode,i.lot,i.expiry,i.quantity,i.unit,i.supplier];if(currentMode==='order')b.push(i.price);b.push(i.location,i.chemical,i.scannedBy,i.dateAdded,i.source);return b;});
+  if(!entries.length){alert('No items to export yet.');return;}
+  var h=['Type','Product name','Brand','Barcode','Lot','Expiry','Quantity','Unit','Supplier','Price','Location','Chemical','Scanned by','Date received','Date ordered','Source'];
+  var rows=entries.map(function(i){return[
+    i.type==='receive'?'Received':'Order',i.name,i.brand,i.barcode,i.lot,i.expiry,
+    i.quantity,i.unit,i.supplier,i.type==='order'?i.price:'',i.location,i.chemical,
+    i.scannedBy,i.type==='receive'?i.dateAdded:'',i.type==='order'?i.dateAdded:'',i.source
+  ];});
   var ws=XLSX.utils.aoa_to_sheet([h].concat(rows));ws['!cols']=h.map(function(){return{wch:16};});
-  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,currentMode==='receive'?'Received':'Orders');
-  XLSX.writeFile(wb,'reorder-'+currentMode+'-'+new Date().toISOString().split('T')[0]+'.xlsx');
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'ReOrder');
+  XLSX.writeFile(wb,'reorder-'+new Date().toISOString().split('T')[0]+'.xlsx');
 }
 </script>
 </body>
